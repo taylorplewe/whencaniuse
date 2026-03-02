@@ -1,12 +1,18 @@
 <!doctype html>
 <html>
   <head>
-    <title>CanIUse Subscribe</title>
+    <title>caniuse subscribe</title>
     <script type="module" src="datastar.js"></script>
   </head>
   <body>
-    <h1>ayyyy ya boiiiii</h1>
-    <button data-on:click="@get('/swappy')">Click me</button>
-    <p id="apples">My text should be replaced</p>
+    <main>
+      <label for="feature-search">Which feature?</label>
+      <input
+        id="feature-search"
+        type="text"
+        data-bind:search-value
+        data-on:input__debounce.500ms="@get('/feature-search')"
+      >
+    </main>
   </body>
 </html>

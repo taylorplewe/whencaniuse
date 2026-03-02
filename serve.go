@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/starfederation/datastar-go/datastar"
 )
 
 func main() {
@@ -21,16 +19,18 @@ func main() {
 func serve(w http.ResponseWriter, req *http.Request) {
 	trimmedUrl := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/")
 
+	fmt.Println()
 	fmt.Printf("req.URL: '%s'\n", req.URL)
-	fmt.Printf("req.URL.Path: '%s'\n", req.URL.Path)
 	fmt.Printf("req.URL trimmed: '%s'\n", trimmedUrl)
+
+	if req.Header.Get("Datastar-Request") == "true" {
+		HandleDatastarRequests(w, req)
+		return
+	}
 
 	switch trimmedUrl {
 	case "":
 		http.ServeFile(w, req, "index.html")
-	case "swappy":
-		sse := datastar.NewSSE(w, req)
-		sse.PatchElements(`<p id="apples">a p p l e s</p>`)
 	default:
 		http.ServeFile(w, req, trimmedUrl)
 	}
