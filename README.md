@@ -8,6 +8,7 @@ This server runs on a Raspberry Pi 5 running Debian 12. It doesn't really make s
 
 Requirements:
 - [Go](https://go.dev/) >=1.24
+- [Datastar](https://data-star.dev/guide/getting_started#data-*) v1.0.0 - the [minified datastar.js file](https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js) must be downloaded to the root directory.
 ```sh
 go get
 go build
