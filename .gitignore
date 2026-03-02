@@ -1,0 +1,25 @@
+# (default Go .gitignore template from GitHub, minus some stuff)
+# Binaries for programs and plugins
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env
+
+# Taylor's additions
+go.sum
+caniuse-subscribe
+datastar.js
