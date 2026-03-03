@@ -11,8 +11,9 @@
         id="feature-search"
         type="search"
         data-bind:search-value
-        data-on:input__debounce.500ms="@get('/feature-search')"
+        data-on:input="@get('/feature-search')"
       >
+      <p>Support percentage for that feature: <strong><span id="result-percentage"></span></strong></p>
     </main>
   </body>
 </html>

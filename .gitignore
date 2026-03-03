@@ -23,3 +23,8 @@ go.work.sum
 go.sum
 caniuse-subscribe
 datastar.js
+caniuse-data.json
+
+# C++
+.a
+.o
