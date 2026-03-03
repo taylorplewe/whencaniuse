@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+
+:root {
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  color: #333;
+
+  height: 100vh;
+  overflow: hidden;
+  padding: 16px;
+}
+main {
+  margin: 0 auto;
+  width: 512px;
+  max-width: 100%;
+}
+::selection {
+  background-color: #777;
+}
+
+input {
+  border: none;
+  background-color: #555;
+  color: white;
+}
+
+label[for="feature-search"] {
+  display: block;
+  text-align: center;
+  font-size: 1.5rem;
+}
+input#feature-search {
+  display: block;
+  padding: 12px;
+  border-radius: 4px;
+  width: 100%;
+  font-family: inherit;
+  &::-webkit-search-cancel-button {
+    display: none; /* TODO style this thing white or something if possible (not sure it is) */
+  }
+  outline-color: white;
+  outline-width: 2px;
+  transition: outline-width 0.3s;
+
+  &:focus {
+    outline-width: 4px;
+    
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #222;
+    color: #ccc;
+  }
+}

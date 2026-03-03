@@ -17,6 +17,8 @@ func main() {
 		Handler: http.HandlerFunc(serve),
 	}
 
+	// whenever a SIGUSR1 is received, reload the caniuse.json into the C++'s internal data buffer.
+	// this happens regularly via a cronjob on this machine, immediately after downloading the newest version of the data.
 	signal.Notify(ShouldReloadCaniuseData, syscall.SIGUSR1)
 	go func() {
 		for range ShouldReloadCaniuseData {
