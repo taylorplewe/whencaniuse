@@ -23,6 +23,7 @@ func main() {
 			ReloadCaniuseData()
 		}
 	}()
+	ReloadCaniuseData()
 
 	fmt.Println("Listening on port 1999...")
 	httpServer.ListenAndServe()

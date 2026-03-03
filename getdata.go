@@ -5,6 +5,7 @@ package main
 #cgo LDFLAGS: -l curl -l simdjson
 #include <stdlib.h>
 float get_support(const char *feature_id);
+void reload_caniuse_data();
 */
 import "C"
 import (
@@ -21,5 +22,6 @@ func GetSupportPercentageForFeature(featureId string) float32 {
 }
 
 func ReloadCaniuseData() {
-	fmt.Println("Reloading...")
+	fmt.Println("Reloading data...")
+	C.reload_caniuse_data()
 }
