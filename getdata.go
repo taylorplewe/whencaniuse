@@ -8,6 +8,7 @@ float get_support(const char *feature_id);
 */
 import "C"
 import (
+	"fmt"
 	"unsafe"
 )
 
@@ -17,4 +18,8 @@ func GetSupportPercentageForFeature(featureId string) float32 {
 	cPercentage := C.get_support(name)
 	percentage := float32(cPercentage)
 	return percentage
+}
+
+func ReloadCaniuseData() {
+	fmt.Println("Reloading...")
 }

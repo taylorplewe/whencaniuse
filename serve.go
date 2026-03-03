@@ -3,14 +3,26 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 )
+
+var ShouldReloadCaniuseData chan os.Signal = make(chan os.Signal, 1)
 
 func main() {
 	httpServer := http.Server{
 		Addr:    ":1999",
 		Handler: http.HandlerFunc(serve),
 	}
+
+	signal.Notify(ShouldReloadCaniuseData, syscall.SIGUSR1)
+	go func() {
+		for range ShouldReloadCaniuseData {
+			ReloadCaniuseData()
+		}
+	}()
 
 	fmt.Println("Listening on port 1999...")
 	httpServer.ListenAndServe()
