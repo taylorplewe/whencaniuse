@@ -30,14 +30,15 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request) {
 
 		fmt.Println("search value:", params.SearchValue)
 
-		percentage := GetSupportPercentageForFeature(params.SearchValue)
+		featureListHtml := GetFeatureListHtmlFromSearchString(params.SearchValue)
 
 		sse := datastar.NewSSE(w, req)
-		if percentage == 0.0 {
-			sse.PatchElements(`<span id="result-percentage">Feature not found!</span>`)
-		} else {
-			sse.PatchElementf(`<span id="result-percentage">%f</span>`, percentage)
-		}
+		sse.PatchElementf(`<ul id="feature-search-results">%s</ul>`, featureListHtml)
+		// if percentage == 0.0 {
+		// 	sse.PatchElements(`<span id="result-percentage">Feature not found!</span>`)
+		// } else {
+		// 	sse.PatchElementf(`<span id="result-percentage">%f</span>`, percentage)
+		// }
 	}
 }
 

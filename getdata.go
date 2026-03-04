@@ -4,21 +4,35 @@ package main
 #cgo CXXFLAGS: -std=c++23
 #cgo LDFLAGS: -l curl -l simdjson
 #include <stdlib.h>
-float get_support(const char *feature_id);
-void reload_caniuse_data();
+#include <parse.h>
 */
 import "C"
 import (
 	"fmt"
+	"strings"
 	"unsafe"
 )
 
-func GetSupportPercentageForFeature(featureId string) float32 {
-	name := C.CString(featureId)
+func GetFeatureListHtmlFromSearchString(query string) string {
+	fmt.Println("getting results for ", query, "...")
+	name := C.CString(query)
 	defer C.free(unsafe.Pointer(name))
-	cPercentage := C.get_support(name)
-	percentage := float32(cPercentage)
-	return percentage
+	res := C.search(name)
+	defer C.free_search_results(res.features, res.len)
+
+	var html strings.Builder
+	for _, feature := range unsafe.Slice(res.features, res.len) {
+		id := C.GoString(feature.id)
+		title := C.GoString(feature.title)
+		description := C.GoString(feature.description)
+		fmt.Fprintf(&html, `
+			<li>(%s) <strong>%s</strong> - %s</li>
+		`, id, title, description)
+	}
+
+	// cPercentage := C.search(name)
+	// percentage := float32(cPercentage)
+	return html.String()
 }
 
 func ReloadCaniuseData() {
