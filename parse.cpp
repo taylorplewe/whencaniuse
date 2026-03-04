@@ -55,7 +55,7 @@ extern "C" float get_support(const char* feature_id) {
   simdjson::ondemand::parser parser;
   simdjson::ondemand::document doc = parser.iterate(simdjson::padded_string_view(json_region->data, json_region->len, json_region->len + simdjson::SIMDJSON_PADDING));
 
-  auto data = doc["data"].value().get_object().value();
+  simdjson::ondemand::object data = doc["data"].value().get_object();
 
   auto item_result = data[feature_id];
   if (item_result.has_value()) {
