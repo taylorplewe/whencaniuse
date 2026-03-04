@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>caniuse subscribe</title>
+    <title>When can I use...</title>
     <script type="module" src="datastar.js"></script>
     <link rel="stylesheet" href="styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,7 @@
         id="feature-search"
         type="search"
         data-bind:search-value
-        data-on:input="@get('/feature-search')"
+        data-on:input__debounce.200ms="@get('/feature-search')"
       >
       <ul id="feature-search-results"></ul>
     </main>
