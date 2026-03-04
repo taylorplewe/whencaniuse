@@ -1,11 +1,14 @@
-#include <atomic>
-#include <cstring>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <atomic>
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
+
 #include <simdjson.h>
+
 
 #define CANIUSE_DATA_SYMLINK "./caniuse-data.json"
 
@@ -14,6 +17,7 @@ struct MemRegion {
   size_t len;
 };
 std::atomic<std::shared_ptr<MemRegion>> caniuse_json_mem_region;
+
 
 extern "C" void reload_caniuse_data() {
   puts("c++: memory update begin...");
@@ -55,10 +59,10 @@ extern "C" float get_support(const char* feature_id) {
 
   auto item_result = data[feature_id];
   if (item_result.has_value()) {
-    auto item = data[feature_id].value().get_object().value();
+    simdjson::ondemand::object item = data[feature_id].value().get_object();
 
     for (auto field : item) {
-      auto key = field.unescaped_key().value();
+      std::basic_string_view<char> key = field.unescaped_key();
       if (key == "usage_perc_y") {
         percentage += field.value().get_double().value();
       } else if (key == "usage_perc_a") {
