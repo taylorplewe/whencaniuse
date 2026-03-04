@@ -23,8 +23,8 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 	var html strings.Builder
 	for _, feature := range unsafe.Slice(res.features, res.len) {
 		id := C.GoString(feature.id)
-		title := encodeCodeBlocks(C.GoString(feature.title))
-		description := encodeCodeBlocks(C.GoString(feature.description))
+		title := encodeMdText(C.GoString(feature.title))
+		description := encodeMdText(C.GoString(feature.description))
 		fmt.Fprintf(&html, `
 			<li>(%s) <strong>%s</strong> - %s</li>
 		`, id, title, description)
@@ -38,6 +38,10 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 func ReloadCaniuseData() {
 	fmt.Println("Reloading data...")
 	C.reload_caniuse_data()
+}
+
+func encodeMdText(text string) string {
+	return encodeLinks(encodeCodeBlocks(text))
 }
 
 func encodeCodeBlocks(text string) string {
@@ -64,5 +68,68 @@ func encodeCodeBlocks(text string) string {
 	if isInCodeBlock {
 		fmt.Fprintf(&newText, "`%s", codeBlockText.String())
 	}
+	return newText.String()
+}
+
+func encodeLinks(text string) string {
+	type State uint
+	const (
+		StateNormal State = iota
+		StateInLinkText
+		StateExpectingLinkHref
+		StateInLinkHref
+	)
+	state := StateNormal
+	var newText strings.Builder
+	var linkText strings.Builder
+	var linkHref strings.Builder
+	for _, r := range text {
+		switch state {
+		case StateNormal:
+			switch r {
+			case '[':
+				state = StateInLinkText
+			default:
+				newText.WriteRune(r)
+			}
+		case StateInLinkText:
+			switch r {
+			case ']':
+				state = StateExpectingLinkHref
+			default:
+				linkText.WriteRune(r)
+			}
+		case StateExpectingLinkHref:
+			switch r {
+			case '(':
+				state = StateInLinkHref
+			default:
+				state = StateNormal
+				fmt.Fprintf(&newText, "[%s]", linkText.String())
+				linkText.Reset()
+			}
+		case StateInLinkHref:
+			switch r {
+			case ')':
+				state = StateNormal
+				fmt.Fprintf(&newText, `<a href="%s" target="_blank">%s</a>`, linkHref.String(), linkText.String())
+				linkText.Reset()
+				linkHref.Reset()
+			default:
+				linkHref.WriteRune(r)
+			}
+		}
+	}
+
+	// flush if ended in unfinished parsing state
+	switch state {
+	case StateInLinkText:
+		fmt.Fprintf(&newText, "[%s", linkText.String())
+	case StateInLinkHref:
+		fmt.Fprintf(&newText, "[%s](%s", linkText.String(), linkHref.String())
+	case StateExpectingLinkHref:
+		fmt.Fprintf(&newText, "[%s]", linkText.String())
+	}
+
 	return newText.String()
 }

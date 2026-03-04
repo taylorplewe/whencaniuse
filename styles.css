@@ -3,8 +3,11 @@
 :root {
   font-family: "IBM Plex Sans", sans-serif;
 
+  --col-brand: #88d;
+  --col-brand-hover:      hsl(from var(--col-brand) h s calc(l + 12));
   --col-bg: #222120;
   --col-text: #ccc;
+  --col-form-face-dark:   hsl(from var(--col-bg) h s calc(l - 3));
   --col-form-face:        hsl(from var(--col-bg) h s calc(l + 6));
   --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l + 9));
   --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l + 12));
@@ -24,6 +27,25 @@ body {
 main {
   margin: 64px auto 0 auto;
   width: 60%;
+}
+ul {
+  list-style: none;
+  padding-inline-start: 0;
+}
+a {
+  text-decoration: none;
+  transition: color .2s;
+  &:not(:visited) {
+    color: var(--col-brand);
+    &:hover {
+      color: var(--col-brand-hover);
+    }
+  }
+}
+code {
+  background-color: var(--col-form-face-dark);
+  padding-inline: 6px;
+  border-radius: 4px;
 }
 ::selection {
   background-color: #777;
@@ -82,7 +104,7 @@ input#feature-search {
     --col-form-face:        hsl(from var(--col-bg) h s calc(l - 6));
     --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l - 9));
     --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l - 12));
-    --col-form-outline:     #88d;
+    --col-form-outline:     var(--col-brand);
   }
 
   input {
