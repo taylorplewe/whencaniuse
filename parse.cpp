@@ -63,19 +63,41 @@ extern "C" SearchResult search(const char* query) {
     std::basic_string_view<char> feature_id = feature.unescaped_key();
     if (feature_id.starts_with(query)) {
       printf("c++: found feature\n");
-      auto new_feature_id = (char*)malloc(feature_id.length());
-      auto new_feature_title = (char*)malloc(32);
-      auto new_feature_description = (char*)malloc(32);
+      char* new_feature_id = (char*)malloc(feature_id.length() + 1);
+      new_feature_id[feature_id.length()] = 0;
+      char* new_feature_title = nullptr;
+      char* new_feature_description = nullptr;
       feature_id.copy(new_feature_id, feature_id.length());
-      strcpy(new_feature_title, "feature title");
-      strcpy(new_feature_description, "feature description");
-      features[features_len] = {
+
+      simdjson::ondemand::object feature_obj = feature.value();
+      for (auto field : feature_obj) {
+        std::basic_string_view<char> key = field.unescaped_key();
+        if (key == "title") {
+          std::basic_string_view<char> title = field.value().get_string();
+          new_feature_title = (char*)malloc(title.length() + 1);
+          new_feature_title[title.length()] = 0;
+          title.copy(new_feature_title, title.length());
+        } else if (key == "description") {
+          std::basic_string_view<char> description = field.value().get_string();
+          new_feature_description = (char*)malloc(description.length() + 1);
+          new_feature_description[description.length()] = 0;
+          description.copy(new_feature_description, description.length());
+        }
+      }
+
+      if (new_feature_title == nullptr || new_feature_description == nullptr) {
+        printf("ERROR: %s did not have a title or description\n", new_feature_id);
+        if (new_feature_title != nullptr) free(new_feature_title);
+        if (new_feature_description != nullptr) free(new_feature_description);
+        free(new_feature_id);
+        continue;
+      }
+
+      features[features_len++] = {
         .id = new_feature_id,
         .title = new_feature_title,
         .description = new_feature_description,
       };
-
-      features_len++;
       if (features_len == MAX_SEARCH_FEATURES) {
         break;
       }

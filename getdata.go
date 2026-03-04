@@ -23,8 +23,8 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 	var html strings.Builder
 	for _, feature := range unsafe.Slice(res.features, res.len) {
 		id := C.GoString(feature.id)
-		title := C.GoString(feature.title)
-		description := C.GoString(feature.description)
+		title := encodeCodeBlocks(C.GoString(feature.title))
+		description := encodeCodeBlocks(C.GoString(feature.description))
 		fmt.Fprintf(&html, `
 			<li>(%s) <strong>%s</strong> - %s</li>
 		`, id, title, description)
@@ -38,4 +38,31 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 func ReloadCaniuseData() {
 	fmt.Println("Reloading data...")
 	C.reload_caniuse_data()
+}
+
+func encodeCodeBlocks(text string) string {
+	isInCodeBlock := false
+	var newText strings.Builder
+	var codeBlockText strings.Builder
+	for _, r := range text {
+		if r == '`' {
+			if isInCodeBlock {
+				isInCodeBlock = false
+				fmt.Fprintf(&newText, "<code>%s</code>", codeBlockText.String())
+				codeBlockText.Reset()
+			} else {
+				isInCodeBlock = true
+			}
+		} else {
+			if isInCodeBlock {
+				codeBlockText.WriteRune(r)
+			} else {
+				newText.WriteRune(r)
+			}
+		}
+	}
+	if isInCodeBlock {
+		fmt.Fprintf(&newText, "`%s", codeBlockText.String())
+	}
+	return newText.String()
 }
