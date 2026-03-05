@@ -15,7 +15,7 @@ Requirements:
 ```sh
 go get
 go build
-./caniuse-subscribe
+./whencaniuse
 ```
 
 ## Structure

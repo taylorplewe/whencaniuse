@@ -21,6 +21,6 @@ go.work.sum
 
 # Taylor's additions
 go.sum
-caniuse-subscribe
+whencaniuse
 datastar.js
 caniuse-data.json

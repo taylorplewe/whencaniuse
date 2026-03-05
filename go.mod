@@ -1,4 +1,4 @@
-module caniuse-subscribe
+module whencaniuse
 
 go 1.24.5
 
