@@ -68,6 +68,7 @@ extern "C" SearchResult search(const char* query) {
       char* new_feature_description = nullptr;
       feature_id.copy(new_feature_id, feature_id.length());
 
+      // TODO do not call malloc for every string
       simdjson::ondemand::object feature_obj = feature.value();
       for (auto field : feature_obj) {
         std::basic_string_view<char> key = field.unescaped_key();
