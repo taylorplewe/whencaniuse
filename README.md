@@ -1,4 +1,4 @@
-# CanIUse Subscribe
+# WhenCanIUse
 Pick any upcoming web feature. Get notified as soon as it hits a certain browser support threshold.
 
 Support data is pulled from [caniuse.com](https://caniuse.com) (hence the name), specifically the [GitHub repo containing the raw data](https://github.com/Fyrd/caniuse).
