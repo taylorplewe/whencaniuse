@@ -9,6 +9,7 @@ package main
 import "C"
 import (
 	"fmt"
+	"html"
 	"strings"
 	"unsafe"
 )
@@ -25,9 +26,13 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 		id := C.GoString(feature.id)
 		title := encodeMdText(C.GoString(feature.title))
 		description := encodeMdText(C.GoString(feature.description))
-		fmt.Fprintf(&html, `
-			<li>(%s) <strong>%s</strong> - %s</li>
-		`, id, title, description)
+		fmt.Fprintf(&html, `<li>
+			<hgroup>
+				<h1>%s</h1>
+				<p><code>%s</code></p>
+			</hgroup>
+			<p>%s</p>
+		</li>`, title, id, description)
 	}
 
 	// cPercentage := C.search(name)
@@ -41,7 +46,8 @@ func ReloadCaniuseData() {
 }
 
 func encodeMdText(text string) string {
-	return encodeLinks(encodeCodeBlocks(text))
+	htmlEscapedText := html.EscapeString(text)
+	return encodeLinks(encodeCodeBlocks(htmlEscapedText))
 }
 
 func encodeCodeBlocks(text string) string {

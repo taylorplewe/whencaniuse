@@ -2,6 +2,7 @@
 
 :root {
   font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12pt;
 
   --col-brand: #88d;
   --col-brand-hover:      hsl(from var(--col-brand) h s calc(l + 12));
@@ -12,6 +13,9 @@
   --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l + 9));
   --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l + 12));
   --col-form-outline:     white;
+
+  --box-shadow-form-face-trim: inset 0 0 0 2px var(--col-form-face-trim);
+  --box-shadow-card: 0 4px 8px #00000040;
 }
 
 body {
@@ -20,8 +24,6 @@ body {
   display: flex;
   color: var(--col-text);
 
-  height: 100vh;
-  overflow: hidden;
   padding: 16px;
 }
 main {
@@ -42,6 +44,9 @@ a {
     }
   }
 }
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
 code {
   background-color: var(--col-form-face-dark);
   padding-inline: 6px;
@@ -56,7 +61,7 @@ input {
   border: none;
   background-color: var(--col-form-face);
   color: white;
-  box-shadow: inset 0 0 0 2px var(--col-form-face-trim);
+  box-shadow: var(--box-shadow-form-face-trim);
   outline: 2px solid rgb(from var(--col-form-outline) r g b / 0);
   transition: all 0.2s;
 
@@ -85,9 +90,58 @@ input#feature-search {
     display: none; /* TODO style this thing white or something if possible (not sure it is) */
   }
 
-  box-shadow: 0 4px 8px #00000040, inset 0 0 0 2px var(--col-form-face-trim);
+  box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
   &:hover:not(:focus) {
-    box-shadow: 0 4px 8px #00000020;
+    box-shadow: var(--box-shadow-card);
+  }
+} 
+
+ul#feature-search-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+  gap: 8px;
+  
+  & > li {
+    container-type: inline-size;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    background-color: var(--col-form-face);
+    cursor: pointer;
+    padding: 16px;
+    border-radius: 4px;
+
+    transition: all .2s;
+    box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
+    opacity: .8;
+    &:hover {
+      background-color: var(--col-form-face-hilite);
+      box-shadow: var(--box-shadow-card);
+      opacity: 1;
+    }
+  }
+  hgroup {
+    width: 100%;
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    @container (max-width: 350px) {
+      display: initial;
+    }
+    & > h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    code {
+      background-color: unset;
+      padding: unset;
+      border-radius: unset;
+      font-style: italic;
+      color: #ffffff30;
+    }
   }
 }
 

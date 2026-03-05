@@ -62,7 +62,6 @@ extern "C" SearchResult search(const char* query) {
   for (auto feature : data) {
     std::basic_string_view<char> feature_id = feature.unescaped_key();
     if (feature_id.starts_with(query)) {
-      printf("c++: found feature\n");
       char* new_feature_id = (char*)malloc(feature_id.length() + 1);
       new_feature_id[feature_id.length()] = 0;
       char* new_feature_title = nullptr;
