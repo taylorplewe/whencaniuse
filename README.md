@@ -21,7 +21,7 @@ go build
 ## Structure
 - The website portion is fully server-side-rendered via a Go web server which sends page updates via [Datastar](https://data-star.dev). Other than the aforementioned minified `datastar.js`, this site contains no Javascript.
 - Caniuse data ([`fulldata-json/data-2.0.json` from github.com/Fyrd/caniuse](https://raw.githubusercontent.com/Fyrd/caniuse/refs/heads/main/fulldata-json/data-2.0.json)) is downloaded via a cronjob once a day to the server at 3:00 AM MDT. That cronjob then sends a signal (`SIGUSR1`) to the whencaniuse server telling it to update its data buffer with the new data.
-- Any time data from the aforementioned >4KB JSON file is required, it is parsed in C++ using [simdjson](https://simdjson.org/). The Go code communicates with the C++ code via [cgo](https://go.dev/wiki/cgo)
+- Any time data from the aforementioned >4.5MB JSON file is required, it is parsed in C++ using [simdjson](https://simdjson.org/). The Go code communicates with the C++ code via [cgo](https://go.dev/wiki/cgo)
 - Current plan is to use Amazon SES for sending the emails
 
 ## Notes
