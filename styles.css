@@ -8,7 +8,6 @@
   --col-brand-hover:      hsl(from var(--col-brand) h s calc(l + 12));
   --col-bg: #222120;
   --col-text: #ccc;
-  --col-form-face-dark:   hsl(from var(--col-bg) h s calc(l - 3));
   --col-form-face:        hsl(from var(--col-bg) h s calc(l + 6));
   --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l + 9));
   --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l + 12));
@@ -48,7 +47,7 @@ h1, h2, h3, h4, h5, h6, p {
   margin: 0;
 }
 code {
-  background-color: var(--col-form-face-dark);
+  background-color: #0004;
   padding-inline: 6px;
   border-radius: 4px;
 }
@@ -56,23 +55,23 @@ code {
   background-color: #777;
 }
 
-input {
-  font-family: inherit;
-  border: none;
-  background-color: var(--col-form-face);
-  color: white;
-  box-shadow: var(--box-shadow-form-face-trim);
-  outline: 2px solid rgb(from var(--col-form-outline) r g b / 0);
-  transition: all 0.2s;
+/* input { */
+  /* font-family: inherit; */
+  /* border: none; */
+  /* background-color: var(--col-form-face); */
+  /* color: white; */
+  /* box-shadow: var(--box-shadow-form-face-trim); */
+  /* outline: 2px solid rgb(from var(--col-form-outline) r g b / 0); */
+  /* transition: all 0.2s; */
 
-  &:hover:not(:focus) {
-    box-shadow: none;
-    background-color: var(--col-form-face-hilite);
-  }
-  &:focus-visible {
-    outline-color: var(--col-form-outline);
-  }
-}
+  /* &:hover:not(:focus) { */
+    /* box-shadow: none; */
+    /* background-color: var(--col-form-face-hilite); */
+  /* } */
+  /* &:focus-visible { */
+    /* outline-color: var(--col-form-outline); */
+  /* } */
+/* } */
 
 label[for="feature-search"] {
   display: block;
@@ -80,33 +79,70 @@ label[for="feature-search"] {
   font-size: 1.5rem;
   margin-bottom: .5em;
 }
-input#feature-search {
-  font-size: 1.5rem;
-  display: block;
-  padding: 16px;
-  border-radius: 4px;
-  width: 100%;
-  &::-webkit-search-cancel-button {
-    display: none; /* TODO style this thing white or something if possible (not sure it is) */
-  }
+form#feature-search {
+  --pad: 0.75em;
 
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  gap: var(--pad);
+  place-items: center;
+
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--pad);
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1.5rem;
+  background-color: var(--col-form-face);
+  color: white;
+
+  transition: all 0.2s;
   box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
+  outline: 2px solid rgb(from var(--col-form-outline) r g b / 0);
   &:hover:not(:focus) {
     box-shadow: var(--box-shadow-card);
+    background-color: var(--col-form-face-hilite);
+  }
+  &:focus-within {
+    outline-color: var(--col-form-outline);
+  }
+
+  &::before {
+    display: block;
+    background-color: #fff4;
+    content: "";
+    height: 1em;
+    aspect-ratio: 1;
+    mask-image: url("./magnifying-glass.svg");
+    mask-size: contain;
+  }
+
+  & > input {
+    background-color: initial;
+    color: inherit;
+    border: none;
+    font-size: inherit;
+    margin: 0;
+    outline: none;
+    padding: 0;
+    width: 100%;
+    &::-webkit-search-cancel-button {
+      display: none; /* TODO style this thing white or something if possible (not sure it is) */
+    }
   }
 } 
 
 ul#feature-search-results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
   gap: 8px;
   
   & > li {
-    container-type: inline-size;
-
     display: flex;
     flex-direction: column;
     gap: 12px;
+    /* height: max-content; */
 
     background-color: var(--col-form-face);
     cursor: pointer;
@@ -126,11 +162,9 @@ ul#feature-search-results {
     width: 100%;
     box-sizing: border-box;
     display: inline-flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    align-items: center;
-    @container (max-width: 350px) {
-      display: initial;
-    }
+    align-items: start;
     & > h1 {
       font-size: 1.5rem;
       margin: 0;
@@ -140,7 +174,7 @@ ul#feature-search-results {
       padding: unset;
       border-radius: unset;
       font-style: italic;
-      color: #ffffff30;
+      color: #fff3;
     }
   }
 }
@@ -161,7 +195,18 @@ ul#feature-search-results {
     --col-form-outline:     var(--col-brand);
   }
 
-  input {
+  form#feature-search {
     color: inherit;
+    &::before {
+      background-color: #0004;
+    }
+  }
+  
+  ul#feature-search-results {
+    hgroup {
+      code {
+        color: #0003;
+      }
+    }
   }
 }

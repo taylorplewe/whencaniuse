@@ -9,12 +9,13 @@
   <body>
     <main>
       <label for="feature-search">Which feature?</label>
-      <input
-        id="feature-search"
-        type="search"
-        data-bind:search-value
-        data-on:input__debounce.200ms="@get('/feature-search')"
-      >
+      <form id="feature-search">
+        <input
+          type="search"
+          data-bind:search-value
+          data-on:input__debounce.200ms="@get('/feature-search')"
+        >
+      </form>
       <article id="main-content">
         <ul id="feature-search-results"></ul>
       </article>

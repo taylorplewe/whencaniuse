@@ -111,7 +111,7 @@ func encodeLinks(text string) string {
 				state = StateInLinkHref
 			default:
 				state = StateNormal
-				fmt.Fprintf(&newText, "[%s]", linkText.String())
+				fmt.Fprintf(&newText, "[%s]%c", linkText.String(), r)
 				linkText.Reset()
 			}
 		case StateInLinkHref:
