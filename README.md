@@ -12,6 +12,7 @@ This server runs on a Raspberry Pi 5 running Debian 12. It doesn't really make s
 Requirements:
 - [Go](https://go.dev/) >=1.24
 - [Datastar](https://data-star.dev) v1.0.0 - the [minified datastar.js file](https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js) (13KB) must be downloaded to the root directory.
+- simdjson must be compiled into a static library and put in a standard place for libs; e.g., `/usr/lib/libsimdjson.a`.
 ```sh
 go get
 go build
@@ -25,4 +26,4 @@ go build
 - Current plan is to use Amazon SES for sending the emails
 
 ## Notes
-- I've struggled choosing between a Go server and a Rust one. I didn't want to just write the whole web server in C++ because there is no built-in first-party TCP network utils; there is with Go and Rust. Go has HTML templating built into the standard library, so that's a plus, though it may not even be needed for a site this simple. Go is _pretty_ performant, being a compiled language, but is garbage collected, and cannot match the performance of Rust. However, the difference is negligable compared to network speed, which is the real bottleneck when it comes to how fast the web page feels. Nonetheless, I'm considering switching to Rust because there's no overhead/added code when calling into C, unlike with Go. In addition, there's still quite a bit more logic I need to write (in both languages) before the site is done; I'm wondering if the performance difference will be noticable by the end.
+- I've struggled choosing between a Go server and a Rust one. I didn't want to just write the whole web server in C++ because there is no built-in first-party TCP network utils; there is with Go and Rust. Go has HTML templating built into the standard library, so that's a plus, though it may not even be needed for a site this simple. Go is _pretty_ performant, being a compiled language, but is garbage collected, and cannot match the performance of Rust. However, the difference is negligable compared to network speed, which is the real bottleneck when it comes to how fast the web page feels. Nonetheless, I'm considering switching to Rust because there's no overhead/added code when calling into C, unlike with Go. In addition, there's still quite a bit more logic I need to write (in both languages) before the site is done; I'm wondering if the performance difference will be noticable by the end. I am also considering Zig since it too has TCP/IP utils in the standard library, is very fast, and C interop is incredibly natural. It's just less mature than the other options, and I saw something about the official Datastar Zig SDK being deprecated.
