@@ -41,7 +41,8 @@ else
 fi
 
 # combine into one binary data file
-./gen-combined-whencaniuse-data-file
+genDataOutput=$(./gen-combined-whencaniuse-data-file)
+echo "$(date) - $genDataOutput" >> $LOG_FILE
 
 
 serverPid=$(pgrep whencaniuse)
@@ -56,5 +57,5 @@ if [ $? -ne 0 ]; then
   echo "$(date) - ERROR: could not send SIGUSR1 signal to whencaniuse server:" >> $LOG_FILE
   echo "$output" >> $LOG_FILE
 else
-  echo "$(date) - sent SIGUSR1 signal to whencaniuse server" >> $LOG_FILE
+  echo "$(date) - sent SIGUSR1 signal to whencaniuse server (PID: $serverPid)" >> $LOG_FILE
 fi
