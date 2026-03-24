@@ -20,7 +20,10 @@ go.work.sum
 .env
 
 # Taylor's additions
+data
 go.sum
 whencaniuse
 datastar.js
 caniuse-data.json
+
+**/paths.sh
