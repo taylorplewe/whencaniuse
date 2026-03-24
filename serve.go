@@ -28,7 +28,10 @@ func main() {
 	ReloadCaniuseData()
 
 	fmt.Println("Listening on port 1999...")
-	httpServer.ListenAndServe()
+	err := httpServer.ListenAndServe()
+	if err != nil {
+		fmt.Println("An error occurred: %v", err)
+	}
 }
 
 func serve(w http.ResponseWriter, req *http.Request) {
