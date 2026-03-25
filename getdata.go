@@ -4,7 +4,7 @@ package main
 #cgo CXXFLAGS: -std=c++23
 #cgo LDFLAGS: -l curl -l simdjson
 #include <stdlib.h>
-#include <parse.h>
+#include <parse-new.h>
 */
 import "C"
 import (

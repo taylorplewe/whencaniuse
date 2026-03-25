@@ -40,7 +40,8 @@ enum PassKind {
 void process_caniuse_section(std::ofstream&);
 void process_bcd_section(std::ofstream&);
 void process_web_features_section(std::ofstream&);
-void write_value_simd_padded(std::ofstream&, char*, int);
+void write_string(std::ofstream&, const char*, int);
+void write_string_simd_padded(std::ofstream&, char*, int);
 
 uint32_t num_features = 0;
 uint32_t header_pos = 0;
@@ -117,7 +118,8 @@ void process_caniuse_section(std::ofstream& out) {
         uint32_t key_pos = out.tellp();
         uint16_t key_len = key_text.size();
         out.write((char*)&key_len, 2);
-        out.write(key_text.data(), key_text.size());
+        write_string(out, key_text.data(), key_text.size());
+        // out.write(key_text.data(), key_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&key_pos, 4);
@@ -129,7 +131,8 @@ void process_caniuse_section(std::ofstream& out) {
         uint32_t title_pos = out.tellp();
         uint16_t title_len = title_text.size();
         out.write((char*)&title_len, 2);
-        out.write(title_text.data(), title_text.size());
+        write_string(out, title_text.data(), title_text.size());
+        // out.write(title_text.data(), title_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&title_pos, 4);
@@ -144,7 +147,7 @@ void process_caniuse_section(std::ofstream& out) {
         uint32_t title_lower_pos = out.tellp();
         uint16_t title_lower_len = title_text.size();
         out.write((char*)&title_lower_len, 2);
-        write_value_simd_padded(out, title_lower_buf, title_text.size());
+        write_string_simd_padded(out, title_lower_buf, title_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&title_lower_pos, 4);
@@ -157,7 +160,8 @@ void process_caniuse_section(std::ofstream& out) {
         uint32_t description_pos = out.tellp();
         uint16_t description_len = description_text.size();
         out.write((char*)&description_len, 2);
-        out.write(description_text.data(), description_text.size());
+        write_string(out, description_text.data(), description_text.size());
+        // out.write(description_text.data(), description_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&description_pos, 4);
@@ -383,7 +387,8 @@ void append_bcd_feature_tree(
             uint32_t key_pos = out.tellp();
             uint16_t key_len = key_text.size();
             out.write((char*)&key_len, 2);
-            out.write(key_text.data(), key_text.size());
+            write_string(out, key_text.data(), key_text.size());
+            // out.write(key_text.data(), key_text.size());
 
             out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&key_pos, 4);
@@ -401,7 +406,8 @@ void append_bcd_feature_tree(
             uint32_t title_pos = out.tellp();
             uint16_t title_len = value_text.size();
             out.write((char*)&title_len, 2);
-            out.write(value_text.data(), value_text.size());
+            write_string(out, value_text.data(), value_text.size());
+            // out.write(value_text.data(), value_text.size());
 
             out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&title_pos, 4);
@@ -416,7 +422,7 @@ void append_bcd_feature_tree(
             uint32_t title_lower_pos = out.tellp();
             uint16_t title_lower_len = value_text.size();
             out.write((char*)&title_lower_len, 2);
-            write_value_simd_padded(out, title_lower_buf, value_text.size());
+            write_string_simd_padded(out, title_lower_buf, value_text.size());
 
             out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&title_lower_pos, 4);
@@ -584,7 +590,8 @@ void process_web_features_section(std::ofstream& out) {
         uint32_t key_pos = out.tellp();
         uint16_t key_len = key_text.size();
         out.write((char*)&key_len, 2);
-        out.write(key_text.data(), key_text.size());
+        write_string(out, key_text.data(), key_text.size());
+        // out.write(key_text.data(), key_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&key_pos, 4);
@@ -596,7 +603,8 @@ void process_web_features_section(std::ofstream& out) {
         uint32_t title_pos = out.tellp();
         uint16_t title_len = title_text.size();
         out.write((char*)&title_len, 2);
-        out.write(title_text.data(), title_text.size());
+        write_string(out, title_text.data(), title_text.size());
+        // out.write(title_text.data(), title_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&title_pos, 4);
@@ -605,13 +613,18 @@ void process_web_features_section(std::ofstream& out) {
       }
       case ::WriteTitlesLower: {
         memcpy(title_lower_buf, title_text.data(), title_text.size());
-        std::transform(title_lower_buf, title_lower_buf+title_text.size(), title_lower_buf, ::tolower);
+        std::transform(
+         title_lower_buf,
+         title_lower_buf + title_text.size(),
+         title_lower_buf,
+         ::tolower
+        );
 
         out.seekp(0, std::ios_base::end);
         uint32_t title_lower_pos = out.tellp();
         uint16_t title_lower_len = title_text.size();
         out.write((char*)&title_lower_len, 2);
-        write_value_simd_padded(out, title_lower_buf, title_text.size());
+        write_string_simd_padded(out, title_lower_buf, title_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&title_lower_pos, 4);
@@ -624,7 +637,8 @@ void process_web_features_section(std::ofstream& out) {
         uint32_t description_pos = out.tellp();
         uint16_t description_len = description_text.size();
         out.write((char*)&description_len, 2);
-        out.write(description_text.data(), description_text.size());
+        write_string(out, description_text.data(), description_text.size());
+        // out.write(description_text.data(), description_text.size());
 
         out.seekp(header_pos, std::ios_base::beg);
         out.write((char*)&description_pos, 4);
@@ -666,9 +680,15 @@ void process_web_features_section(std::ofstream& out) {
   }
 }
 
-void write_value_simd_padded(std::ofstream& out, char* data, int len) {
+void write_string(std::ofstream& out, const char* data, int len) {
   out.write(data, len);
-  if (len % SIMD_VECTOR_SIZE != 0) {
-    out.write(zeroes, SIMD_VECTOR_SIZE - (len % SIMD_VECTOR_SIZE));
+  out.write(zeroes, 1);
+}
+
+void write_string_simd_padded(std::ofstream& out, char* data, int len) {
+  out.write(data, len);
+  out.write(zeroes, 1);
+  if ((len + 1) % SIMD_VECTOR_SIZE != 0) {
+    out.write(zeroes, SIMD_VECTOR_SIZE - ((len + 1)% SIMD_VECTOR_SIZE));
   }
 }

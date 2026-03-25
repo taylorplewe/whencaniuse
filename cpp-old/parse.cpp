@@ -12,7 +12,7 @@
 #include "parse.h"
 
 
-#define CANIUSE_DATA_SYMLINK "./caniuse-data.json"
+#define CANIUSE_DATA_PATH "data/caniuse-data.json"
 
 struct MemRegion {
   char* data;
@@ -23,7 +23,7 @@ std::atomic<std::shared_ptr<MemRegion>> caniuse_json_mem_region;
 extern "C" void reload_caniuse_data() {
   puts("c++: memory update begin...");
   // open symlink'd file and get size
-  int caniuse_data_fd = open(CANIUSE_DATA_SYMLINK, O_RDONLY);
+  int caniuse_data_fd = open(CANIUSE_DATA_PATH, O_RDONLY);
   struct stat caniuse_data_fstat;
   fstat(caniuse_data_fd, &caniuse_data_fstat);
   size_t caniuse_data_size = caniuse_data_fstat.st_size;

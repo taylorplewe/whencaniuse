@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -16,6 +17,10 @@ struct MemRegion {
 std::atomic<std::shared_ptr<MemRegion>> feature_data_mem_region;
 
 #define FEATURE_DATA_PATH "data/combined-data.bin"
+#define HEADER_ENTRY_SIZE 32
+
+uint32_t num_features = 0;
+char* zeroes = (char[16]){0};
 
 
 extern "C" void reload_caniuse_data() {
@@ -43,19 +48,86 @@ extern "C" void reload_caniuse_data() {
   feature_data_mem_region.store(region, std::memory_order_release);
   puts("c++: memory update success!");
 
-  printf("number of features: %i\n", *(int*)(region->data));
+  num_features = *(uint32_t*)(region->data);
+  printf("number of features: %i\n", num_features);
 }
 
 #define MAX_SEARCH_FEATURES 32
-// extern "C" SearchResult search(const char* query) {
-// }
+extern "C" SearchResult search(const char* query) {
+  auto feature_data = feature_data_mem_region.load(std::memory_order_acquire);
+  FeatureSimple* features = new FeatureSimple[MAX_SEARCH_FEATURES];
+  int features_len = 0;
+
+  // printf("searching for '%s'...\n", query);
+  // puts("returning first item");
+
+  // uint32_t addr_id          = *(uint32_t*)(feature_data->data + 4);
+  // uint32_t addr_title       = *(uint32_t*)(feature_data->data + 8);
+  // uint32_t addr_title_lower = *(uint32_t*)(feature_data->data + 12);
+  // uint32_t addr_description = *(uint32_t*)(feature_data->data + 16);
+  // features[0] = {
+  //   .id = (char*)(feature_data->data + addr_id + 2),
+  //   .title = (char*)(feature_data->data + addr_title + 2),
+  //   .description = (char*)(feature_data->data + addr_description + 2),
+  // };
+  // features_len++;
+
+  // #if 0
 
 
-// extern "C" void free_search_results(FeatureSimple* results, int len) {
-// }
+  uint64_t seek = 4; // first ID address
+  uint32_t addr_id,
+           addr_title,
+           addr_title_lower,
+           addr_description;
+  for (int i = 0; i < num_features; i++) {
+    addr_id          = *(uint32_t*)(feature_data->data + seek);
+    addr_title       = *(uint32_t*)(feature_data->data + seek + 4);
+    addr_title_lower = *(uint32_t*)(feature_data->data + seek + 8);
+    addr_description = *(uint32_t*)(feature_data->data + seek + 12);
+    if (addr_id) {
+      uint16_t id_len = *(uint16_t*)(feature_data->data + addr_id);
+      auto id = std::basic_string_view<char>(feature_data->data + addr_id + 2, id_len);
 
-int main(int argc, char** argv) {
-  reload_caniuse_data();
+      if (id.contains(query)) {
+        features[features_len++] = {
+          .id = (char*)(feature_data->data + addr_id + 2),
+          .title = addr_title
+            ? (char*)(feature_data->data + addr_title + 2)
+            : zeroes,
+          .description = addr_description
+            ? (char*)(feature_data->data + addr_description + 2)
+            : zeroes,
+        };
+        if (features_len == MAX_SEARCH_FEATURES) break;
+      }
+    }
+    
+    // postlude
+    seek += HEADER_ENTRY_SIZE;
+  }
 
-  return 0;
+  // #endif
+
+  return {
+    .features = features,
+    .len = features_len, 
+  };
 }
+
+
+extern "C" void free_search_results(FeatureSimple* results, int len) {
+  // didn't malloc the strings, don't need to free
+  // for (int i = 0; i < len; i++) {
+  //   free(results[i].id);
+  //   free(results[i].title);
+  //   free(results[i].description);
+  // }
+  delete[] results;
+}
+
+// int main(int argc, char** argv) {
+//   reload_caniuse_data();
+
+  // return 0;
+// }
