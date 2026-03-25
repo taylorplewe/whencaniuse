@@ -176,6 +176,7 @@ ul#feature-search-results {
       border-radius: unset;
       font-style: italic;
       color: #fff3;
+      word-break: break-word;
     }
   }
 }
