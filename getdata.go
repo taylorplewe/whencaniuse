@@ -2,9 +2,8 @@ package main
 
 /*
 #cgo CXXFLAGS: -std=c++23
-#cgo LDFLAGS: -l curl -l simdjson
 #include <stdlib.h>
-#include <parse-new.h>
+#include <parse.h>
 */
 import "C"
 import (
@@ -15,7 +14,7 @@ import (
 )
 
 func GetFeatureListHtmlFromSearchString(query string) string {
-	fmt.Println("getting results for ", query, "...")
+	// fmt.Println("getting results for ", query, "...")
 	name := C.CString(query)
 	defer C.free(unsafe.Pointer(name))
 	res := C.search(name)
