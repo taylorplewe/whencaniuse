@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/starfederation/datastar-go/datastar"
 )
@@ -22,6 +23,7 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request) {
 		sse := datastar.NewSSE(w, req)
 		sse.PatchElements(`<p id="apples">a p p l e s</p>`)
 	case "feature-search":
+		before := time.Now()
 		params := &FeatureSearchParams{}
 		if err := getDatastarParams(req, &params); err != nil {
 			w.WriteHeader(500)
@@ -34,6 +36,7 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request) {
 
 		sse := datastar.NewSSE(w, req)
 		sse.PatchElementf(`<ul id="feature-search-results">%s</ul>`, featureListHtml)
+		fmt.Println("time took from request to response: %v", time.Since(before))
 		// if percentage == 0.0 {
 		// 	sse.PatchElements(`<span id="result-percentage">Feature not found!</span>`)
 		// } else {
