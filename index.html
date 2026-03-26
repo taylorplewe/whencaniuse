@@ -11,7 +11,9 @@
       <label for="feature-search">Which feature?</label>
       <form id="feature-search">
         <input
+          id="search"
           type="search"
+          data-init="el.focus()"
           data-bind:search-value
           data-on:input="@get('/feature-search')"
         >
