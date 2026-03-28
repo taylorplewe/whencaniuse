@@ -8,9 +8,8 @@ package main
 import "C"
 import (
 	"fmt"
-	"html"
-	"html/template"
 	"strings"
+	"text/template"
 	"unsafe"
 )
 
@@ -67,13 +66,9 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 	}
 }
 
-func encodeMdText(text string, shouldEncodeLinks bool) string {
-	htmlEscapedText := html.EscapeString(text)
-	if shouldEncodeLinks {
-		return encodeLinks(encodeCodeBlocks(htmlEscapedText))
-	} else {
-		return encodeLinksAsRegularText(encodeCodeBlocks(htmlEscapedText))
-	}
+func encodeMdText(text string, shouldRenderATags bool) string {
+	// htmlEscapedText := html.EscapeString(text)
+	return encodeLinks(encodeCodeBlocks(text), shouldRenderATags)
 }
 
 func encodeCodeBlocks(text string) string {
@@ -103,7 +98,7 @@ func encodeCodeBlocks(text string) string {
 	return newText.String()
 }
 
-func encodeLinksAsRegularText(text string) string {
+func encodeLinks(text string, shouldRenderATags bool) string {
 	type State uint
 	const (
 		StateNormal State = iota
@@ -144,71 +139,11 @@ func encodeLinksAsRegularText(text string) string {
 			switch r {
 			case ')':
 				state = StateNormal
-				newText.WriteString(linkText.String())
-				linkText.Reset()
-				linkHref.Reset()
-			default:
-				linkHref.WriteRune(r)
-			}
-		}
-	}
-
-	// flush if ended in unfinished parsing state
-	switch state {
-	case StateInLinkText:
-		fmt.Fprintf(&newText, "[%s", linkText.String())
-	case StateInLinkHref:
-		fmt.Fprintf(&newText, "[%s](%s", linkText.String(), linkHref.String())
-	case StateExpectingLinkHref:
-		fmt.Fprintf(&newText, "[%s]", linkText.String())
-	}
-
-	return newText.String()
-}
-
-// Leaving this here for later; links should NOT be rendered as <a> tags within the search result feature cards
-func encodeLinks(text string) string {
-	type State uint
-	const (
-		StateNormal State = iota
-		StateInLinkText
-		StateExpectingLinkHref
-		StateInLinkHref
-	)
-	state := StateNormal
-	var newText strings.Builder
-	var linkText strings.Builder
-	var linkHref strings.Builder
-	for _, r := range text {
-		switch state {
-		case StateNormal:
-			switch r {
-			case '[':
-				state = StateInLinkText
-			default:
-				newText.WriteRune(r)
-			}
-		case StateInLinkText:
-			switch r {
-			case ']':
-				state = StateExpectingLinkHref
-			default:
-				linkText.WriteRune(r)
-			}
-		case StateExpectingLinkHref:
-			switch r {
-			case '(':
-				state = StateInLinkHref
-			default:
-				state = StateNormal
-				fmt.Fprintf(&newText, "[%s]%c", linkText.String(), r)
-				linkText.Reset()
-			}
-		case StateInLinkHref:
-			switch r {
-			case ')':
-				state = StateNormal
-				fmt.Fprintf(&newText, `<a href="%s" target="_blank">%s</a>`, linkHref.String(), linkText.String())
+				if shouldRenderATags {
+					fmt.Fprintf(&newText, `<a href="%s" target="_blank">%s</a>`, linkHref.String(), linkText.String())
+				} else {
+					newText.WriteString(linkText.String())
+				}
 				linkText.Reset()
 				linkHref.Reset()
 			default:

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iomanip>
 #include <ios>
 #include <string_view>
 #include <sys/stat.h>
@@ -45,7 +46,8 @@ void write_string_simd_padded(std::ofstream&, char*, int);
 
 uint32_t num_features = 0;
 uint32_t header_pos = 0;
-char* zeroes = (char[16]){0};
+#define ZEROES_LEN 2048
+char* zeroes = (char[ZEROES_LEN]){0};
 PassKind pass = ::CountFeatures;
 
 char title_lower_buf[2048];
@@ -65,9 +67,13 @@ int main(int argc, char** argv) {
   out.write((char*)&num_features, 4);
 
   // write 0s to file making space for the header; actual data can now be appended onto the end, header contains pointers to the data
-  void* header_zeroes = calloc(num_features, HEADER_ENTRY_SIZE);
-  out.write((char*)header_zeroes, num_features * HEADER_ENTRY_SIZE);
-  free(header_zeroes);
+  const int header_len = num_features * HEADER_ENTRY_SIZE;
+  for (int i = 0; i + ZEROES_LEN < header_len; i += ZEROES_LEN) {
+    out.write(zeroes, ZEROES_LEN);
+  }
+  if (header_len % ZEROES_LEN != 0) {
+    out.write(zeroes, header_len % ZEROES_LEN);
+  }
 
   // then actually add to the file
   for (int i = PassKind::WriteIds; i < PassKind::End; i++) {
@@ -328,55 +334,6 @@ void append_bcd_feature_tree(
           }
           value_text.append(title);
         }
-
-        // switch (pass) {
-        //   case ::CountFeatures:
-        //     num_features++;
-        //     break;
-        //   case ::WriteIds: {
-        //     out.seekp(0, std::ios_base::end);
-        //     uint32_t key_pos = out.tellp();
-        //     uint16_t key_len = key_text.size();
-        //     out.write((char*)&key_len, 2);
-        //     out.write(key_text.data(), key_text.size());
-
-        //     out.seekp(header_pos, std::ios_base::beg);
-        //     out.write((char*)&key_pos, 4);
-        //     header_pos += HEADER_ENTRY_SIZE;
-        //     break;
-        //   }
-        //   case ::WriteTitles: {
-        //     out.seekp(0, std::ios_base::end);
-        //     uint32_t title_pos = out.tellp();
-        //     uint16_t title_len = title_text.size();
-        //     out.write((char*)&title_len, 2);
-        //     write_value_simd_padded(out, title_text.data(), title_text.size());
-
-        //     out.seekp(header_pos, std::ios_base::beg);
-        //     out.write((char*)&title_pos, 4);
-        //     header_pos += HEADER_ENTRY_SIZE;
-        //     break;
-        //   }
-        //   case ::WriteTitlesLower: {
-        //     // TODO
-
-        //     break;
-        //   }
-        //   case ::WriteDescriptions: {
-        //     out.seekp(0, std::ios_base::end);
-        //     uint32_t description_pos = out.tellp();
-        //     uint16_t description_len = description_text.size();
-        //     out.write((char*)&description_len, 2);
-        //     out.write(description_text.data(), description_text.size());
-
-        //     out.seekp(header_pos, std::ios_base::beg);
-        //     out.write((char*)&description_pos, 4);
-        //     header_pos += HEADER_ENTRY_SIZE;
-        //   }
-        //   default:
-        //     break;
-        // }
-
         
         switch (pass) {
           case ::CountFeatures:
@@ -396,12 +353,6 @@ void append_bcd_feature_tree(
             break;
           }
           case ::WriteTitles: {
-            // uint32_t title_pos = out.tellp();
-            // uint16_t title_len = value_text.size();
-            // out.write((char*)&title_len, 2);
-            // write_value_simd_padded(out, value_text.data(), value_text.size());
-
-
             out.seekp(0, std::ios_base::end);
             uint32_t title_pos = out.tellp();
             uint16_t title_len = value_text.size();
@@ -431,33 +382,11 @@ void append_bcd_feature_tree(
             break;
           }
           case ::WriteDescriptions:
+            // out.write(zeroes, 4);
+            header_pos += HEADER_ENTRY_SIZE;
           default:
             break;
         }
-
-        // if (just_counting) {
-        //   num_features++;
-        //   continue;
-        // }
-
-        // out.seekp(0, std::ios_base::end);
-
-        // uint32_t key_pos = out.tellp();
-        // uint16_t key_len = key_text.size();
-        // out.write((char*)&key_len, 2);
-        // out.write(key_text.data(), key_text.size());
-
-        // uint32_t title_pos = out.tellp();
-        // uint16_t title_len = value_text.size();
-        // out.write((char*)&title_len, 2);
-        // write_value_simd_padded(out, value_text.data(), value_text.size());
-
-        // out.seekp(header_pos, std::ios_base::beg);
-        // out.write((char*)&key_pos, 4);
-        // out.write((char*)&title_pos, 4);
-        // out.write(zeroes, 4);
-
-        // header_pos += HEADER_ENTRY_SIZE;
       } else {
         // keep traversing down the tree
         auto new_level_names = bcd_level_names;

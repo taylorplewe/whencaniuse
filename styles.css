@@ -187,7 +187,7 @@ ul#feature-search-results {
       font-size: 1.5rem;
       margin: 0;
     }
-    code {
+    & > p > code {
       background-color: unset;
       padding: unset;
       border-radius: unset;
