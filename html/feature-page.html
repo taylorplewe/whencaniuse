@@ -9,4 +9,10 @@ Expected data shape:
 <article id="feature-content">
   <h1>{{ .Title }}</h1>{{- /**/ -}}
   <p>{{ .Description }}</p>
+  <article id="links">
+    <h2>Links</h2>
+    <ul>
+      <li><a href="https://caniuse.com/{{ .Id }}" target="_blank">"{{ .Title }}" on caniuse.com</a></li>
+    </ul>
+  </article>
 </article>

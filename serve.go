@@ -60,11 +60,11 @@ func serve(w http.ResponseWriter, req *http.Request) {
 	trimmedUrl := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/")
 
 	fmt.Println()
-	fmt.Printf("req.URL: '%s'\n", req.URL)
-	fmt.Printf("req.URL trimmed: '%s'\n", trimmedUrl)
+	// fmt.Printf("req.URL: '%s'\n", req.URL)
+	// fmt.Printf("req.URL trimmed: '%s'\n", trimmedUrl)
 
 	if req.Header.Get("Datastar-Request") == "true" {
-		HandleDatastarRequests(w, req)
+		HandleDatastarRequests(w, req, trimmedUrl)
 		return
 	}
 

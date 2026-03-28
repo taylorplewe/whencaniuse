@@ -15,23 +15,26 @@ type FeatureSearchParams struct {
 	SearchValue string `json:"searchValue"`
 }
 
-func HandleDatastarRequests(w http.ResponseWriter, req *http.Request) {
+func HandleDatastarRequests(w http.ResponseWriter, req *http.Request, url string) {
+	before := time.Now()
 	trimmedUrl := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/")
 
 	switch trimmedUrl {
 	case "feature-search":
-		before := time.Now()
+		sse := datastar.NewSSE(w, req)
 		params := &FeatureSearchParams{}
 		if err := getDatastarParams(req, &params); err != nil {
 			w.WriteHeader(500)
 			return
 		}
 
-		fmt.Println("search value:", params.SearchValue)
+		if len(params.SearchValue) == 0 {
+			sse.PatchElements(`<ul id="feature-search-results"></ul>`)
+			return
+		}
 
 		featureListHtml := GetFeatureListHtmlFromSearchString(params.SearchValue)
 
-		sse := datastar.NewSSE(w, req)
 		sse.PatchElementf(`<ul id="feature-search-results">%s</ul>`, featureListHtml)
 		fmt.Println("time took from request to response:", time.Since(before))
 	}

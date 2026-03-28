@@ -6,6 +6,8 @@
 
   --col-brand: #88d;
   --col-brand-hover:      hsl(from var(--col-brand) h s calc(l + 12));
+  --col-visited:          rgb(from var(--col-brand) calc(r + 40) g calc(b + 40));
+  --col-visited-hover:    hsl(from var(--col-visited) h s calc(l + 12));
   --col-bg: #222120;
   --col-text: #ccc;
   --col-form-face:        hsl(from var(--col-bg) h s calc(l + 6));
@@ -43,6 +45,12 @@ a:not(.feature-card) {
     color: var(--col-brand);
     &:hover {
       color: var(--col-brand-hover);
+    }
+  }
+  &:visited {
+    color: var(--col-visited);
+    &:hover {
+      color: var(--col-visited-hover);
     }
   }
 }
@@ -187,6 +195,12 @@ ul#feature-search-results {
       color: #fff3;
       word-break: break-word;
     }
+  }
+}
+
+article#feature-content {
+  ul#feature-search-results:not(:empty) + & {
+    display: none;
   }
 }
 
