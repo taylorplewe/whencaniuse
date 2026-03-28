@@ -35,6 +35,9 @@ ul {
 }
 a {
   text-decoration: none;
+  color: inherit;
+}
+a:not(.feature-card) {
   transition: color .2s;
   &:not(:visited) {
     color: var(--col-brand);
@@ -141,22 +144,27 @@ ul#feature-search-results {
   
   & > li {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    /* height: max-content; */
+    & > a {
+      flex-grow: 1;
 
-    background-color: var(--col-form-face);
-    cursor: pointer;
-    padding: 16px;
-    border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      /* height: max-content; */
 
-    transition: all .2s;
-    box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
-    opacity: .8;
-    &:hover {
-      background-color: var(--col-form-face-hilite);
-      box-shadow: var(--box-shadow-card);
-      opacity: 1;
+      background-color: var(--col-form-face);
+      cursor: pointer;
+      padding: 16px;
+      border-radius: 4px;
+
+      transition: all .2s;
+      box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
+      opacity: .8;
+      &:hover {
+        background-color: var(--col-form-face-hilite);
+        box-shadow: var(--box-shadow-card);
+        opacity: 1;
+      }
     }
   }
   hgroup {

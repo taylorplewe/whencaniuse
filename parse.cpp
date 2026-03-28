@@ -1,4 +1,3 @@
-#include <cstdint>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -6,6 +5,8 @@
 #include <atomic>
 #include <cstdio>
 #include <memory>
+#include <cstdint>
+#include <cstring>
 
 #include "parse.h"
 
@@ -98,4 +99,32 @@ extern "C" SearchResult search(const char* query) {
 
 extern "C" void free_search_results(FeatureSimple* results, int len) {
   delete[] results;
+}
+
+extern "C" Feature* get_feature_by_id(const char* id) {
+  printf("searching for feature %s\n", id);
+  auto feature_data = feature_data_mem_region.load(std::memory_order_acquire);
+  uint32_t addr_id,
+           addr_title,
+           addr_description;
+  for (int i = 0; i < num_features; i++) {
+    const uint32_t seek = (i * HEADER_ENTRY_SIZE) + 4;
+    addr_id          = *(uint32_t*)(feature_data->data + seek);
+    addr_title       = *(uint32_t*)(feature_data->data + seek + 4);
+    addr_description = *(uint32_t*)(feature_data->data + seek + 12);
+
+    if (strcmp(feature_data->data + addr_id + 2, id) == 0) {
+      Feature* feature = new Feature{
+        .id          = feature_data->data + 2 + addr_id,
+        .title       = feature_data->data + 2 + addr_title,
+        .description = feature_data->data + 2 + addr_description,
+      };
+      return feature;
+    }
+  }
+
+  return nullptr;
+}
+extern "C" void free_feature(Feature* feature) {
+  delete feature;
 }

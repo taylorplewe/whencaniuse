@@ -15,9 +15,17 @@ typedef struct {
   int len;
 } SearchResult;
 
+typedef struct {
+  char* id;
+  char* title;
+  char* description;
+} Feature;
+
+void reload_caniuse_data();
 SearchResult search(const char*);
 void free_search_results(FeatureSimple*, int);
-void reload_caniuse_data();
+Feature* get_feature_by_id(const char*);
+void free_feature(Feature*);
 
 #ifdef __cplusplus
 }

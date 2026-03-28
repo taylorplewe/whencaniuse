@@ -19,9 +19,6 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request) {
 	trimmedUrl := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/")
 
 	switch trimmedUrl {
-	case "swappy":
-		sse := datastar.NewSSE(w, req)
-		sse.PatchElements(`<p id="apples">a p p l e s</p>`)
 	case "feature-search":
 		before := time.Now()
 		params := &FeatureSearchParams{}
@@ -36,12 +33,7 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request) {
 
 		sse := datastar.NewSSE(w, req)
 		sse.PatchElementf(`<ul id="feature-search-results">%s</ul>`, featureListHtml)
-		fmt.Println("time took from request to response: %v", time.Since(before))
-		// if percentage == 0.0 {
-		// 	sse.PatchElements(`<span id="result-percentage">Feature not found!</span>`)
-		// } else {
-		// 	sse.PatchElementf(`<span id="result-percentage">%f</span>`, percentage)
-		// }
+		fmt.Println("time took from request to response:", time.Since(before))
 	}
 }
 

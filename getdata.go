@@ -9,9 +9,15 @@ import "C"
 import (
 	"fmt"
 	"html"
+	"html/template"
 	"strings"
 	"unsafe"
 )
+
+func ReloadCaniuseData() {
+	fmt.Println("Reloading data...")
+	C.reload_caniuse_data()
+}
 
 func GetFeatureListHtmlFromSearchString(query string) string {
 	// fmt.Println("getting results for ", query, "...")
@@ -23,15 +29,16 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 	var html strings.Builder
 	for _, feature := range unsafe.Slice(res.features, res.len) {
 		id := C.GoString(feature.id)
-		title := encodeMdText(C.GoString(feature.title))
-		description := encodeMdText(C.GoString(feature.description))
-		fmt.Fprintf(&html, `<li>
-			<hgroup>
-				<h1>%s</h1>
-				<p><code>%s</code></p>
-			</hgroup>
-			<p>%s</p>
-		</li>`, title, id, description)
+		title := encodeMdText(C.GoString(feature.title), false)
+		description := encodeMdText(C.GoString(feature.description), false)
+		t, _ := template.ParseFiles("html/feature-result-card.html")
+		type Data struct {
+			Id          string
+			Title       string
+			Description string
+		}
+		d := &Data{id, title, description}
+		_ = t.Execute(&html, d)
 	}
 
 	// cPercentage := C.search(name)
@@ -39,14 +46,26 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 	return html.String()
 }
 
-func ReloadCaniuseData() {
-	fmt.Println("Reloading data...")
-	C.reload_caniuse_data()
+func GetFeatureFromId(id string) (string, error) {
+	c_id := C.CString(id)
+	defer C.free(unsafe.Pointer(c_id))
+	feature := C.get_feature_by_id(c_id)
+	if feature != nil {
+		defer C.free_feature(feature)
+		title := encodeMdText(C.GoString(feature.title), true)
+		return title, nil
+	} else {
+		return "", fmt.Errorf("No feature found with ID '%s'", id)
+	}
 }
 
-func encodeMdText(text string) string {
+func encodeMdText(text string, shouldEncodeLinks bool) string {
 	htmlEscapedText := html.EscapeString(text)
-	return encodeLinks(encodeCodeBlocks(htmlEscapedText))
+	if shouldEncodeLinks {
+		return encodeLinks(encodeCodeBlocks(htmlEscapedText))
+	} else {
+		return encodeLinksAsRegularText(encodeCodeBlocks(htmlEscapedText))
+	}
 }
 
 func encodeCodeBlocks(text string) string {
@@ -76,6 +95,70 @@ func encodeCodeBlocks(text string) string {
 	return newText.String()
 }
 
+func encodeLinksAsRegularText(text string) string {
+	type State uint
+	const (
+		StateNormal State = iota
+		StateInLinkText
+		StateExpectingLinkHref
+		StateInLinkHref
+	)
+	state := StateNormal
+	var newText strings.Builder
+	var linkText strings.Builder
+	var linkHref strings.Builder
+	for _, r := range text {
+		switch state {
+		case StateNormal:
+			switch r {
+			case '[':
+				state = StateInLinkText
+			default:
+				newText.WriteRune(r)
+			}
+		case StateInLinkText:
+			switch r {
+			case ']':
+				state = StateExpectingLinkHref
+			default:
+				linkText.WriteRune(r)
+			}
+		case StateExpectingLinkHref:
+			switch r {
+			case '(':
+				state = StateInLinkHref
+			default:
+				state = StateNormal
+				fmt.Fprintf(&newText, "[%s]%c", linkText.String(), r)
+				linkText.Reset()
+			}
+		case StateInLinkHref:
+			switch r {
+			case ')':
+				state = StateNormal
+				newText.WriteString(linkText.String())
+				linkText.Reset()
+				linkHref.Reset()
+			default:
+				linkHref.WriteRune(r)
+			}
+		}
+	}
+
+	// flush if ended in unfinished parsing state
+	switch state {
+	case StateInLinkText:
+		fmt.Fprintf(&newText, "[%s", linkText.String())
+	case StateInLinkHref:
+		fmt.Fprintf(&newText, "[%s](%s", linkText.String(), linkHref.String())
+	case StateExpectingLinkHref:
+		fmt.Fprintf(&newText, "[%s]", linkText.String())
+	}
+
+	return newText.String()
+}
+
+// Leaving this here for later; links should NOT be rendered as <a> tags within the search result feature cards
 func encodeLinks(text string) string {
 	type State uint
 	const (

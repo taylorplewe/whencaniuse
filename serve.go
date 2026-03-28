@@ -7,9 +7,12 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"text/template"
 )
 
 var ShouldReloadCaniuseData chan os.Signal = make(chan os.Signal, 1)
+
+var indexTemplate *template.Template
 
 func main() {
 	httpServer := http.Server{
@@ -27,10 +30,17 @@ func main() {
 	}()
 	ReloadCaniuseData()
 
-	fmt.Println("Listening on port 1999...")
-	err := httpServer.ListenAndServe()
+	var err error
+	indexTemplate, err = template.ParseFiles("html/index.html")
 	if err != nil {
-		fmt.Println("An error occurred: %v", err)
+		fmt.Println("could not parse html/index.html")
+		return
+	}
+
+	fmt.Println("Listening on port 1999...")
+	err = httpServer.ListenAndServe()
+	if err != nil {
+		fmt.Println("An error occurred:", err)
 	}
 }
 
@@ -48,8 +58,19 @@ func serve(w http.ResponseWriter, req *http.Request) {
 
 	switch trimmedUrl {
 	case "":
-		http.ServeFile(w, req, "index.html")
+		indexTemplate.Execute(w, `<ul id="feature-search-results"></ul>`)
+		// http.ServeFile(w, req, "index.html")
 	default:
-		http.ServeFile(w, req, trimmedUrl)
+		if strings.ContainsRune(trimmedUrl, '.') {
+			http.ServeFile(w, req, trimmedUrl)
+		} else {
+			featureTitle, err := GetFeatureFromId(trimmedUrl)
+			if err != nil {
+				indexTemplate.Execute(w, fmt.Sprintf("No feature find with ID '%s'", trimmedUrl))
+			} else {
+				indexTemplate.Execute(w, featureTitle)
+			}
+			// http.ServeFile(w, req, "index.html")
+		}
 	}
 }

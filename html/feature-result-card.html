@@ -1,0 +1,17 @@
+{{- /*
+Expected data shape:
+{
+  Id string
+  Title string
+  Description string
+}
+*/ -}}
+<li>{{- /**/ -}}
+	<a class="feature-card" href="{{ .Id }}">{{- /**/ -}}
+		<hgroup>{{- /**/ -}}
+			<h1>{{ .Title }}</h1>{{- /**/ -}}
+			<p><code>{{ .Id }}</code></p>{{- /**/ -}}
+		</hgroup>{{- /**/ -}}
+		<p>{{ .Description }}</p>{{- /**/ -}}
+	</a>{{- /**/ -}}
+</li>
