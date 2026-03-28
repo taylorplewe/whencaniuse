@@ -12,7 +12,14 @@ import (
 
 var ShouldReloadCaniuseData chan os.Signal = make(chan os.Signal, 1)
 
-var indexTemplate *template.Template
+var templateIndex *template.Template
+var templateFeaturePage *template.Template
+
+type Feature struct {
+	Id          string
+	Title       string
+	Description string
+}
 
 func main() {
 	httpServer := http.Server{
@@ -31,7 +38,12 @@ func main() {
 	ReloadCaniuseData()
 
 	var err error
-	indexTemplate, err = template.ParseFiles("html/index.html")
+	templateIndex, err = template.ParseFiles("html/index.html")
+	if err != nil {
+		fmt.Println("could not parse html/index.html")
+		return
+	}
+	templateFeaturePage, err = template.ParseFiles("html/feature-page.html")
 	if err != nil {
 		fmt.Println("could not parse html/index.html")
 		return
@@ -58,17 +70,17 @@ func serve(w http.ResponseWriter, req *http.Request) {
 
 	switch trimmedUrl {
 	case "":
-		indexTemplate.Execute(w, `<ul id="feature-search-results"></ul>`)
+		templateIndex.Execute(w, `<ul id="feature-search-results"></ul>`)
 		// http.ServeFile(w, req, "index.html")
 	default:
 		if strings.ContainsRune(trimmedUrl, '.') {
 			http.ServeFile(w, req, trimmedUrl)
 		} else {
-			featureTitle, err := GetFeatureFromId(trimmedUrl)
+			html, err := GetFeatureHtmlFromId(trimmedUrl)
 			if err != nil {
-				indexTemplate.Execute(w, fmt.Sprintf("No feature find with ID '%s'", trimmedUrl))
+				templateIndex.Execute(w, fmt.Sprintf(`<p class="error">No feature found with ID '%s'`, trimmedUrl))
 			} else {
-				indexTemplate.Execute(w, featureTitle)
+				w.Write([]byte(html))
 			}
 			// http.ServeFile(w, req, "index.html")
 		}

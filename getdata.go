@@ -41,21 +41,29 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 		_ = t.Execute(&html, d)
 	}
 
-	// cPercentage := C.search(name)
-	// percentage := float32(cPercentage)
 	return html.String()
 }
 
-func GetFeatureFromId(id string) (string, error) {
+func GetFeatureHtmlFromId(id string) (string, error) {
 	c_id := C.CString(id)
 	defer C.free(unsafe.Pointer(c_id))
-	feature := C.get_feature_by_id(c_id)
-	if feature != nil {
-		defer C.free_feature(feature)
-		title := encodeMdText(C.GoString(feature.title), true)
-		return title, nil
+	c_feature := C.get_feature_by_id(c_id)
+	if c_feature != nil {
+		defer C.free_feature(c_feature)
+		title := encodeMdText(C.GoString(c_feature.title), true)
+		description := encodeMdText(C.GoString(c_feature.description), true)
+		feature := &Feature{
+			Id:          id,
+			Title:       title,
+			Description: description,
+		}
+		var featureContentStr strings.Builder
+		var html strings.Builder
+		_ = templateFeaturePage.Execute(&featureContentStr, feature)
+		_ = templateIndex.Execute(&html, featureContentStr.String())
+		return html.String(), nil
 	} else {
-		return "", fmt.Errorf("No feature found with ID '%s'", id)
+		return "", fmt.Errorf("Could not find feature with ID '%s'", id)
 	}
 }
 
