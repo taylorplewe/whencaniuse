@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iomanip>
 #include <ios>
 #include <string_view>
 #include <sys/stat.h>
@@ -30,11 +29,12 @@
 // NOTE: I did this thinking maybe the CPU would have better cache hits if all the titles followed one after the other in memory, etc. but zero speed difference occurred :(
 enum PassKind {
   CountFeatures,
-  WriteIds,
-  WriteTitles,
-  WriteTitlesLower,
-  WriteDescriptions,
-  End,
+  WriteOutput,
+};
+
+enum LinkKind {
+  Mdn,
+  Spec,
 };
 
 
@@ -49,6 +49,14 @@ uint32_t header_pos = 0;
 #define ZEROES_LEN 2048
 char* zeroes = (char[ZEROES_LEN]){0};
 PassKind pass = ::CountFeatures;
+uint16_t len_key,
+         len_title,
+         len_title_lower,
+         len_description;
+uint32_t addr_key,
+         addr_title,
+         addr_title_lower,
+         addr_description;
 
 char title_lower_buf[2048];
 
@@ -75,14 +83,13 @@ int main(int argc, char** argv) {
     out.write(zeroes, header_len % ZEROES_LEN);
   }
 
+
   // then actually add to the file
-  for (int i = PassKind::WriteIds; i < PassKind::End; i++) {
-    pass = static_cast<PassKind>(i);
-    header_pos = i * 4;
-    process_caniuse_section(out);
-    process_bcd_section(out);
-    process_web_features_section(out);
-  }
+  header_pos = 4;
+  pass = ::WriteOutput;
+  process_caniuse_section(out);
+  process_bcd_section(out);
+  process_web_features_section(out);
 
   out.close();
 }
@@ -119,63 +126,41 @@ void process_caniuse_section(std::ofstream& out) {
       case ::CountFeatures:
         num_features++;
         break;
-      case ::WriteIds: {
+      default: {
         out.seekp(0, std::ios_base::end);
-        uint32_t key_pos = out.tellp();
-        uint16_t key_len = key_text.size();
-        out.write((char*)&key_len, 2);
-        write_string(out, key_text.data(), key_text.size());
-        // out.write(key_text.data(), key_text.size());
+
+        len_key         = key_text.size();
+        len_title       = title_text.size();
+        len_description = description_text.size();
+        
+        addr_key = out.tellp();
+        out.write((char*)&len_key, 2);
+        write_string(out, key_text.data(), len_key);
+
+        addr_title = out.tellp();
+        out.write((char*)&len_title, 2);
+        write_string(out, title_text.data(), len_title);
+
+        memcpy(title_lower_buf, title_text.data(), len_title);
+        std::transform(title_lower_buf, title_lower_buf+len_title, title_lower_buf, ::tolower);
+        addr_title_lower = out.tellp();
+        out.write((char*)&len_title, 2);
+        write_string_simd_padded(out, title_lower_buf, len_title);
+
+        addr_description = out.tellp();
+        out.write((char*)&len_description, 2);
+        write_string(out, description_text.data(), len_description);
 
         out.seekp(header_pos, std::ios_base::beg);
-        out.write((char*)&key_pos, 4);
+
+        out.write((char*)&addr_key, 4);
+        out.write((char*)&addr_title, 4);
+        out.write((char*)&addr_title_lower, 4);
+        out.write((char*)&addr_description, 4);
+
         header_pos += HEADER_ENTRY_SIZE;
         break;
       }
-      case ::WriteTitles: {
-        out.seekp(0, std::ios_base::end);
-        uint32_t title_pos = out.tellp();
-        uint16_t title_len = title_text.size();
-        out.write((char*)&title_len, 2);
-        write_string(out, title_text.data(), title_text.size());
-        // out.write(title_text.data(), title_text.size());
-
-        out.seekp(header_pos, std::ios_base::beg);
-        out.write((char*)&title_pos, 4);
-        header_pos += HEADER_ENTRY_SIZE;
-        break;
-      }
-      case ::WriteTitlesLower: {
-        memcpy(title_lower_buf, title_text.data(), title_text.size());
-        std::transform(title_lower_buf, title_lower_buf+title_text.size(), title_lower_buf, ::tolower);
-
-        out.seekp(0, std::ios_base::end);
-        uint32_t title_lower_pos = out.tellp();
-        uint16_t title_lower_len = title_text.size();
-        out.write((char*)&title_lower_len, 2);
-        write_string_simd_padded(out, title_lower_buf, title_text.size());
-
-        out.seekp(header_pos, std::ios_base::beg);
-        out.write((char*)&title_lower_pos, 4);
-        header_pos += HEADER_ENTRY_SIZE;
-
-        break;
-      }
-      case ::WriteDescriptions: {
-        out.seekp(0, std::ios_base::end);
-        uint32_t description_pos = out.tellp();
-        uint16_t description_len = description_text.size();
-        out.write((char*)&description_len, 2);
-        write_string(out, description_text.data(), description_text.size());
-        // out.write(description_text.data(), description_text.size());
-
-        out.seekp(header_pos, std::ios_base::beg);
-        out.write((char*)&description_pos, 4);
-        header_pos += HEADER_ENTRY_SIZE;
-        break;
-      }
-      default:
-        break;
     }
   }
 }
@@ -339,52 +324,33 @@ void append_bcd_feature_tree(
           case ::CountFeatures:
             num_features++;
             break;
-          case ::WriteIds: {
+          default:
             out.seekp(0, std::ios_base::end);
+
+            len_key = key_text.size();
+            len_title = value_text.size();
+
             uint32_t key_pos = out.tellp();
-            uint16_t key_len = key_text.size();
-            out.write((char*)&key_len, 2);
-            write_string(out, key_text.data(), key_text.size());
-            // out.write(key_text.data(), key_text.size());
+            out.write((char*)&len_key, 2);
+            write_string(out, key_text.data(), len_key);
+
+            uint32_t title_pos = out.tellp();
+            out.write((char*)&len_title, 2);
+            write_string(out, value_text.data(), len_title);
+
+            memcpy(title_lower_buf, value_text.data(), len_title);
+            std::transform(title_lower_buf, title_lower_buf+len_title, title_lower_buf, ::tolower);
+            uint32_t title_lower_pos = out.tellp();
+            out.write((char*)&len_title, 2);
+            write_string_simd_padded(out, title_lower_buf, len_title);
 
             out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&key_pos, 4);
-            header_pos += HEADER_ENTRY_SIZE;
-            break;
-          }
-          case ::WriteTitles: {
-            out.seekp(0, std::ios_base::end);
-            uint32_t title_pos = out.tellp();
-            uint16_t title_len = value_text.size();
-            out.write((char*)&title_len, 2);
-            write_string(out, value_text.data(), value_text.size());
-            // out.write(value_text.data(), value_text.size());
-
-            out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&title_pos, 4);
-            header_pos += HEADER_ENTRY_SIZE;
-            break;
-          }
-          case ::WriteTitlesLower: {
-            memcpy(title_lower_buf, value_text.data(), value_text.size());
-            std::transform(title_lower_buf, title_lower_buf+value_text.size(), title_lower_buf, ::tolower);
-
-            out.seekp(0, std::ios_base::end);
-            uint32_t title_lower_pos = out.tellp();
-            uint16_t title_lower_len = value_text.size();
-            out.write((char*)&title_lower_len, 2);
-            write_string_simd_padded(out, title_lower_buf, value_text.size());
-
-            out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&title_lower_pos, 4);
-            header_pos += HEADER_ENTRY_SIZE;
+            // out.write(zeroes, 4); // description
 
-            break;
-          }
-          case ::WriteDescriptions:
-            // out.write(zeroes, 4);
             header_pos += HEADER_ENTRY_SIZE;
-          default:
             break;
         }
       } else {
@@ -461,151 +427,44 @@ void process_web_features_section(std::ofstream& out) {
       }
     }
 
-    // switch (pass) {
-    //   case ::CountFeatures:
-    //     num_features++;
-    //     break;
-    //   case ::WriteIds: {
-    //     out.seekp(0, std::ios_base::end);
-    //     uint32_t key_pos = out.tellp();
-    //     uint16_t key_len = key_text.size();
-    //     out.write((char*)&key_len, 2);
-    //     out.write(key_text.data(), key_text.size());
-
-    //     out.seekp(header_pos, std::ios_base::beg);
-    //     out.write((char*)&key_pos, 4);
-    //     header_pos += HEADER_ENTRY_SIZE;
-    //     break;
-    //   }
-    //   case ::WriteTitles: {
-    //     out.seekp(0, std::ios_base::end);
-    //     uint32_t title_pos = out.tellp();
-    //     uint16_t title_len = title_text.size();
-    //     out.write((char*)&title_len, 2);
-    //     write_value_simd_padded(out, title_text.data(), title_text.size());
-
-    //     out.seekp(header_pos, std::ios_base::beg);
-    //     out.write((char*)&title_pos, 4);
-    //     header_pos += HEADER_ENTRY_SIZE;
-    //     break;
-    //   }
-    //   case ::WriteTitlesLower: {
-    //     // TODO
-
-    //     break;
-    //   }
-    //   case ::WriteDescriptions: {
-    //     out.seekp(0, std::ios_base::end);
-    //     uint32_t description_pos = out.tellp();
-    //     uint16_t description_len = description_text.size();
-    //     out.write((char*)&description_len, 2);
-    //     out.write(description_text.data(), description_text.size());
-
-    //     out.seekp(header_pos, std::ios_base::beg);
-    //     out.write((char*)&description_pos, 4);
-    //     header_pos += HEADER_ENTRY_SIZE;
-    //   }
-    //   default:
-    //     break;
-    // }
-
-    
     switch (pass) {
       case ::CountFeatures:
         num_features++;
         break;
-      case ::WriteIds: {
+      default: {
         out.seekp(0, std::ios_base::end);
+
+        len_key = key_text.size();
+        len_title = title_text.size();
+        len_description = description_text.size();
+
         uint32_t key_pos = out.tellp();
-        uint16_t key_len = key_text.size();
-        out.write((char*)&key_len, 2);
-        write_string(out, key_text.data(), key_text.size());
-        // out.write(key_text.data(), key_text.size());
+        out.write((char*)&len_key, 2);
+        write_string(out, key_text.data(), len_key);
 
-        out.seekp(header_pos, std::ios_base::beg);
-        out.write((char*)&key_pos, 4);
-        header_pos += HEADER_ENTRY_SIZE;
-        break;
-      }
-      case ::WriteTitles: {
-        out.seekp(0, std::ios_base::end);
         uint32_t title_pos = out.tellp();
-        uint16_t title_len = title_text.size();
-        out.write((char*)&title_len, 2);
-        write_string(out, title_text.data(), title_text.size());
-        // out.write(title_text.data(), title_text.size());
+        out.write((char*)&len_title, 2);
+        write_string(out, title_text.data(), len_title);
 
-        out.seekp(header_pos, std::ios_base::beg);
-        out.write((char*)&title_pos, 4);
-        header_pos += HEADER_ENTRY_SIZE;
-        break;
-      }
-      case ::WriteTitlesLower: {
-        memcpy(title_lower_buf, title_text.data(), title_text.size());
-        std::transform(
-         title_lower_buf,
-         title_lower_buf + title_text.size(),
-         title_lower_buf,
-         ::tolower
-        );
-
-        out.seekp(0, std::ios_base::end);
         uint32_t title_lower_pos = out.tellp();
-        uint16_t title_lower_len = title_text.size();
-        out.write((char*)&title_lower_len, 2);
-        write_string_simd_padded(out, title_lower_buf, title_text.size());
+        out.write((char*)&len_title, 2);
+        write_string_simd_padded(out, title_lower_buf, len_title);
 
-        out.seekp(header_pos, std::ios_base::beg);
-        out.write((char*)&title_lower_pos, 4);
-        header_pos += HEADER_ENTRY_SIZE;
-
-        break;
-      }
-      case ::WriteDescriptions: {
-        out.seekp(0, std::ios_base::end);
         uint32_t description_pos = out.tellp();
-        uint16_t description_len = description_text.size();
-        out.write((char*)&description_len, 2);
-        write_string(out, description_text.data(), description_text.size());
-        // out.write(description_text.data(), description_text.size());
+        out.write((char*)&len_description, 2);
+        write_string(out, description_text.data(), len_description);
 
         out.seekp(header_pos, std::ios_base::beg);
+
+        out.write((char*)&key_pos, 4);
+        out.write((char*)&title_pos, 4);
+        out.write((char*)&title_lower_pos, 4);
         out.write((char*)&description_pos, 4);
+
         header_pos += HEADER_ENTRY_SIZE;
         break;
       }
-      default:
-        break;
     }
-
-    // if (just_counting) {
-    //   num_features++;
-    //   continue;
-    // }
-
-    // out.seekp(0, std::ios_base::end);
-
-    // uint32_t key_pos = out.tellp();
-    // uint16_t key_len = key_text.size();
-    // out.write((char*)&key_len, 2);
-    // out.write(key_text.data(), key_text.size());
-
-    // uint32_t title_pos = out.tellp();
-    // uint16_t title_len = title_text.size();
-    // out.write((char*)&title_len, 2);
-    // write_value_simd_padded(out, title_text.data(), title_text.size());
-
-    // uint32_t description_pos = out.tellp();
-    // uint16_t description_len = description_text.size();
-    // out.write((char*)&description_len, 2);
-    // out.write(description_text.data(), description_text.size());
-
-    // out.seekp(header_pos, std::ios_base::beg);
-    // out.write((char*)&key_pos, 4);
-    // out.write((char*)&title_pos, 4);
-    // out.write((char*)&description_pos, 4);
-
-    // header_pos += HEADER_ENTRY_SIZE;
   }
 }
 
