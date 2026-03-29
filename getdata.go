@@ -20,7 +20,7 @@ func ReloadCaniuseData() {
 
 func GetFeatureListHtmlFromSearchString(query string) string {
 	// fmt.Println("getting results for ", query, "...")
-	name := C.CString(query)
+	name := C.CString(strings.ToLower(query))
 	defer C.free(unsafe.Pointer(name))
 	res := C.search(name)
 	defer C.free_search_results(res.features, res.len)
