@@ -447,6 +447,8 @@ void process_web_features_section(std::ofstream& out) {
         write_string(out, title_text.data(), len_title);
 
         uint32_t title_lower_pos = out.tellp();
+        memcpy(title_lower_buf, title_text.data(), len_title);
+        std::transform(title_lower_buf, title_lower_buf+len_title, title_lower_buf, ::tolower);
         out.write((char*)&len_title, 2);
         write_string_simd_padded(out, title_lower_buf, len_title);
 

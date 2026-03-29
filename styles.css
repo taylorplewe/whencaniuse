@@ -66,6 +66,33 @@ code {
 ::selection {
   background-color: #777;
 }
+button {
+  cursor: pointer;
+  border: none;
+
+  color: inherit;
+  font-family: inherit;
+  background-color: var(--col-form-face);
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 4px;
+
+  transition: all .2s;
+  box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
+  &:hover {
+    background-color: var(--col-form-face-hilite);
+    box-shadow: var(--box-shadow-card);
+    opacity: 1;
+  }
+
+  &::before {
+    display: inline-block;
+    content: "👁️";
+    height: 1em;
+    aspect-ratio: 1;
+  }
+  
+}
 
 /* input { */
   /* font-family: inherit; */
@@ -85,7 +112,7 @@ code {
   /* } */
 /* } */
 
-label[for="feature-search"] {
+label[for="search-input"] {
   display: block;
   text-align: center;
   font-size: 1.5rem;
