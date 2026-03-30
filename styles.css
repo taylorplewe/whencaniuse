@@ -232,6 +232,13 @@ article#feature-content {
 }
 
 article#links {
+  margin-top: 16px;
+
+  & > h2 {
+    color: var(--col-text-faint);
+    font-weight: normal;
+    font-size: 14pt;
+  }
   & > ul {
     list-style-type: emdashes;
     padding-inline-start: revert;

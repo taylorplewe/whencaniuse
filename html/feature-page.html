@@ -6,7 +6,7 @@ Expected data shape: `Feature`
     <h1>{{ .Title }}</h1>
     <p class="global-percentage"><span class="faint">Global</span> <span class="global-percentage-num">86%</span></p>
   </div>
-  <p>{{ .Description }}</p>
+  {{if .Description}}<p>{{ .Description }}</p>{{end}}
   <div class="split-items">
     <button class="with-icon watch-feature">Watch this feature</button>
     <p><span class="faint">Source:</span>
