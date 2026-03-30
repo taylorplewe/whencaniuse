@@ -2,3 +2,4 @@ css-case-insensitive - tests an edge case for a code block ending in a ] - just 
 addeventlistener - both code blocks and links
 details - contains the string "`<details>`" which really messes up the page if not escaped properly
 document-currentscript - contains "`<string>`" in its description and can really mess up the parser if not done correctly
+customizable-select - contains "`<select>`"'s in its description, same as ^^

@@ -8,8 +8,8 @@ package main
 import "C"
 import (
 	"fmt"
+	"html/template"
 	"strings"
-	"text/template"
 	"unsafe"
 )
 
