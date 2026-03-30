@@ -336,7 +336,6 @@ void append_bcd_feature_tree(
             }
             while ((code_pos = value_text.find("</code>")) && code_pos != value_text.npos) {
               value_text.replace(code_pos, len_code_slash, "`");
-              std::cout << "new str" << value_text << std::endl;
             }
 
             out.seekp(0, std::ios_base::end);
@@ -352,6 +351,9 @@ void append_bcd_feature_tree(
             out.write((char*)&len_title, 2);
             write_string(out, value_text.data(), len_title);
 
+            while ((code_pos = value_text.find("`")) && code_pos != value_text.npos) {
+              value_text.replace(code_pos, 1, "");
+            }
             memcpy(title_lower_buf, value_text.data(), len_title);
             std::transform(title_lower_buf, title_lower_buf+len_title, title_lower_buf, ::tolower);
             uint32_t title_lower_pos = out.tellp();
