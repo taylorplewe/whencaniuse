@@ -1,20 +1,23 @@
 {{- /*
-Expected data shape:
-{
-  Id string
-  Title string
-  Description string
-}
+Expected data shape: `Feature`
 */ -}}
 <article id="feature-content">
   <div class="split-items">
     <h1>{{ .Title }}</h1>
-    <p><span class="faint">Global</span> <span class="global-percentage">86%</span></p>
+    <p class="global-percentage"><span class="faint">Global</span> <span class="global-percentage-num">86%</span></p>
   </div>
   <p>{{ .Description }}</p>
   <div class="split-items">
-    <button class="watch-feature">Watch this feature</button>
-    <p><span class="faint">Source:</span> caniuse.com</p>
+    <button class="with-icon watch-feature">Watch this feature</button>
+    <p><span class="faint">Source:</span>
+      {{if eq .Source 0}}
+        caniuse.com
+      {{else if eq .Source 1}}
+        <a href="https://github.com/mdn/browser-compat-data" target="_blank">MDN</a>
+      {{else}}
+        the <a href="https://github.com/web-platform-dx/web-features" target="_blank">web-features</a> project
+      {{end}}
+    </p>
   </div>
   <article id="links">
     <h2>Links</h2>

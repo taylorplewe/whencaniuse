@@ -51,10 +51,17 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 		defer C.free_feature(c_feature)
 		title := encodeMdText(C.GoString(c_feature.title), true)
 		description := encodeMdText(C.GoString(c_feature.description), true)
+		source := SourceKindCaniuse
+		if strings.HasPrefix(id, "mdn-") {
+			source = SourceKindMdn
+		} else if strings.HasPrefix(id, "wf-") {
+			source = SourceKindWebFeatures
+		}
 		feature := &Feature{
-			Id:          id,
-			Title:       title,
-			Description: description,
+			id,
+			title,
+			description,
+			source,
 		}
 		var featureContentStr strings.Builder
 		var html strings.Builder

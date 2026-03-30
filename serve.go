@@ -15,10 +15,19 @@ var ShouldReloadCaniuseData chan os.Signal = make(chan os.Signal, 1)
 var templateIndex *template.Template
 var templateFeaturePage *template.Template
 
+type SourceKind uint
+
+const (
+	SourceKindCaniuse SourceKind = iota
+	SourceKindMdn
+	SourceKindWebFeatures
+)
+
 type Feature struct {
 	Id          string
 	Title       string
 	Description string
+	Source      SourceKind
 }
 
 func main() {
