@@ -8,8 +8,9 @@ package main
 import "C"
 import (
 	"fmt"
-	"html/template"
+	"html"
 	"strings"
+	"text/template"
 	"unsafe"
 )
 
@@ -74,8 +75,8 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 }
 
 func encodeMdText(text string, shouldRenderATags bool) string {
-	// htmlEscapedText := html.EscapeString(text)
-	return encodeLinks(encodeCodeBlocks(text), shouldRenderATags)
+	htmlEscapedText := html.EscapeString(text)
+	return encodeLinks(encodeCodeBlocks(htmlEscapedText), shouldRenderATags)
 }
 
 func encodeCodeBlocks(text string) string {

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstddef>
 #include <ios>
 #include <string_view>
 #include <sys/stat.h>
@@ -15,6 +16,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <variant>
 
 
 #define HEADER_ENTRY_SIZE 32
@@ -325,6 +327,18 @@ void append_bcd_feature_tree(
             num_features++;
             break;
           default:
+            // replace <code> and </code> with `
+            const size_t len_code = strlen("<code>");
+            const size_t len_code_slash = strlen("</code>");
+            size_t code_pos;
+            while ((code_pos = value_text.find("<code>")) && code_pos != value_text.npos) {
+              value_text.replace(code_pos, len_code, "`");
+            }
+            while ((code_pos = value_text.find("</code>")) && code_pos != value_text.npos) {
+              value_text.replace(code_pos, len_code_slash, "`");
+              std::cout << "new str" << value_text << std::endl;
+            }
+
             out.seekp(0, std::ios_base::end);
 
             len_key = key_text.size();
