@@ -7,9 +7,15 @@ Expected data shape:
 }
 */ -}}
 <article id="feature-content">
-  <h1>{{ .Title }}</h1>{{- /**/ -}}
+  <div class="split-items">
+    <h1>{{ .Title }}</h1>
+    <p><span class="faint">Global</span> <span class="global-percentage">86%</span></p>
+  </div>
   <p>{{ .Description }}</p>
-  <button class="watch-feature">Watch this feature</button>
+  <div class="split-items">
+    <button class="watch-feature">Watch this feature</button>
+    <p><span class="faint">Source:</span> caniuse.com</p>
+  </div>
   <article id="links">
     <h2>Links</h2>
     <ul>

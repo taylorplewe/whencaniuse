@@ -10,10 +10,12 @@
   --col-visited-hover:    hsl(from var(--col-visited) h s calc(l + 12));
   --col-bg: #222120;
   --col-text: #ccc;
+  --col-text-faint:       hsl(from var(--col-text) h s calc(l - 24));
   --col-form-face:        hsl(from var(--col-bg) h s calc(l + 6));
   --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l + 9));
   --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l + 12));
   --col-form-outline:     white;
+  --col-support:          #6abe30;
 
   --box-shadow-form-face-trim: inset 0 0 0 2px var(--col-form-face-trim);
   --box-shadow-card: 0 4px 8px #00000040;
@@ -67,17 +69,18 @@ code {
   background-color: #777;
 }
 button {
-  cursor: pointer;
   border: none;
-
   color: inherit;
   font-family: inherit;
+  font-size: inherit;
   background-color: var(--col-form-face);
   cursor: pointer;
-  padding: 16px;
+  padding: 8px 12px;
   border-radius: 4px;
 
-  transition: all .2s;
+  transition: box-shadow .2s,
+    background-color .2s,
+    opacity .2s;
   box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
   &:hover {
     background-color: var(--col-form-face-hilite);
@@ -226,9 +229,25 @@ ul#feature-search-results {
 }
 
 article#feature-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
   ul#feature-search-results:not(:empty) + & {
     display: none;
   }
+}
+
+.split-items {
+  display: flex;
+  justify-content: space-between;
+}
+
+.faint {
+  color: var(--col-text-faint);
+}
+.global-percentage {
+  color: var(--col-support);
 }
 
 @media (max-width: 700px) {
