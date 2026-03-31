@@ -224,6 +224,8 @@ void append_bcd_feature_tree(
         simdjson::ondemand::object& compat_obj = sub_obj.value();
         // get feature's title and links
         std::string title = bcd_level_names.back();
+        // printf("title: %s\n", title.c_str());
+        // fflush(stdout);
         std::string mdn_url,
                     spec_url;
         for (auto compat_field : compat_obj) {
@@ -231,11 +233,17 @@ void append_bcd_feature_tree(
           if (compat_field_key == "description") {
             title = std::string(compat_field.value().get_string().value());
           } else if (compat_field_key == "spec_url") {
-            spec_url = std::string(compat_field.value().get_string().value());
+            if (compat_field.value().get_string().has_value()) {
+              spec_url = std::string(compat_field.value().get_string().value());
+            }
           } else if (compat_field_key == "mdn_url") {
             mdn_url = std::string(compat_field.value().get_string().value());
           }
         }
+
+        // printf("mdn_url: %s\n", mdn_url.c_str());
+        // printf("spec_url: %s\n\n", spec_url.c_str());
+        // fflush(stdout);
 
         auto key_text = std::basic_string<char>("mdn-");
         for (int i = 0; i < bcd_level_names_lower.size(); i++) {
@@ -540,6 +548,7 @@ void process_web_features_section(std::ofstream& out) {
         out.write((char*)&title_pos, 4);
         out.write((char*)&title_lower_pos, 4);
         out.write((char*)&description_pos, 4);
+        out.write(zeroes, 5); // 0 length and empty address
 
         header_pos += HEADER_ENTRY_SIZE;
         break;
