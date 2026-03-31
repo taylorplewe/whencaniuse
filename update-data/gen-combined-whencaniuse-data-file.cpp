@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <ios>
 #include <string_view>
@@ -16,7 +17,6 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
-#include <variant>
 
 
 #define HEADER_ENTRY_SIZE 32
@@ -33,10 +33,14 @@ enum PassKind {
   CountFeatures,
   WriteOutput,
 };
-
 enum LinkKind {
+  String,
   Mdn,
   Spec,
+};
+struct LinkString {
+  std::string display;
+  std::string href;
 };
 
 
@@ -54,11 +58,14 @@ PassKind pass = ::CountFeatures;
 uint16_t len_key,
          len_title,
          len_title_lower,
-         len_description;
+         len_description,
+         len_link;
 uint32_t addr_key,
          addr_title,
          addr_title_lower,
-         addr_description;
+         addr_description,
+         addr_links;
+std::vector<LinkString> current_links;
 
 char title_lower_buf[2048];
 
@@ -121,6 +128,22 @@ void process_caniuse_section(std::ofstream& out) {
         title_text = std::basic_string<char>(field.value().get_string().value());
       } else if (field_name == "description") {
         description_text = std::basic_string<char>(field.value().get_string().value());
+      } else if (field_name == "links") {
+        current_links.clear();
+        simdjson::ondemand::array links = field.value();
+        for (simdjson::ondemand::object link : links) {
+          LinkString l = {};
+          for (auto field : link) {
+            std::basic_string_view<char> link_field_name = field.unescaped_key();
+            if (link_field_name == "url") {
+              l.href = std::basic_string<char>(field.value().get_string().value());
+            } else if (link_field_name == "title") {
+              l.display = std::basic_string<char>(field.value().get_string().value());
+            }
+          }
+          current_links.push_back(l);
+        }
+        assert(current_links.size() < 256);
       }
     }
 
@@ -153,12 +176,27 @@ void process_caniuse_section(std::ofstream& out) {
         out.write((char*)&len_description, 2);
         write_string(out, description_text.data(), len_description);
 
+        addr_links = out.tellp();
+        uint8_t num_links = current_links.size();
+        for (LinkString l : current_links) {
+          uint8_t link_kind = LinkKind::String;
+          uint16_t len_display = l.display.size();
+          uint16_t len_href = l.href.size();
+          out.write((char*)&link_kind, 1);
+          out.write((char*)&len_display, 2);
+          out.write(l.display.data(), l.display.size());
+          out.write((char*)&len_href, 2);
+          out.write(l.href.data(), l.href.size());
+        }
+
         out.seekp(header_pos, std::ios_base::beg);
 
         out.write((char*)&addr_key, 4);
         out.write((char*)&addr_title, 4);
         out.write((char*)&addr_title_lower, 4);
         out.write((char*)&addr_description, 4);
+        out.write((char*)&num_links, 1);
+        out.write((char*)&addr_links, 4);
 
         header_pos += HEADER_ENTRY_SIZE;
         break;
