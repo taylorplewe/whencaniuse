@@ -38,6 +38,8 @@ enum LinkKind {
   Mdn,
   Spec,
 };
+uint8_t link_kind_mdn = LinkKind::Mdn;
+uint8_t link_kind_spec = LinkKind::Spec;
 struct LinkString {
   std::string display;
   std::string href;
@@ -66,6 +68,7 @@ uint32_t addr_key,
          addr_description,
          addr_links;
 std::vector<LinkString> current_links;
+uint8_t num_bcd_links = 2;
 
 char title_lower_buf[2048];
 
@@ -205,14 +208,6 @@ void process_caniuse_section(std::ofstream& out) {
   }
 }
 
-std::string get_bcd_description_or_id(simdjson::ondemand::object& compat, std::string& id) {
-  auto description_res = compat["description"];
-  if (description_res.has_value()) {
-    return std::basic_string<char>(description_res.value().get_string().value());
-  }
-  return id;
-}
-
 /// given a JSON object, presumably a subsection of MDN's browser-compat-data, append all features downstream of here with __compat entries to the output JSON
 void append_bcd_feature_tree(
   std::vector<std::string> bcd_level_names,
@@ -227,7 +222,20 @@ void append_bcd_feature_tree(
       if (id == "__compat") {
         // add this feature to the list
         simdjson::ondemand::object& compat_obj = sub_obj.value();
-        std::string title = get_bcd_description_or_id(compat_obj, bcd_level_names.back());
+        // get feature's title and links
+        std::string title = bcd_level_names.back();
+        std::string mdn_url,
+                    spec_url;
+        for (auto compat_field : compat_obj) {
+          std::basic_string_view<char> compat_field_key = compat_field.unescaped_key();
+          if (compat_field_key == "description") {
+            title = std::string(compat_field.value().get_string().value());
+          } else if (compat_field_key == "spec_url") {
+            spec_url = std::string(compat_field.value().get_string().value());
+          } else if (compat_field_key == "mdn_url") {
+            mdn_url = std::string(compat_field.value().get_string().value());
+          }
+        }
 
         auto key_text = std::basic_string<char>("mdn-");
         for (int i = 0; i < bcd_level_names_lower.size(); i++) {
@@ -381,14 +389,18 @@ void append_bcd_feature_tree(
             len_key = key_text.size();
             len_title = value_text.size();
 
+            // write caniuse ID
             uint32_t key_pos = out.tellp();
             out.write((char*)&len_key, 2);
             write_string(out, key_text.data(), len_key);
 
+            // write human-readable title
             uint32_t title_pos = out.tellp();
             out.write((char*)&len_title, 2);
             write_string(out, value_text.data(), len_title);
 
+            // write lowercased searchable title
+            // remove the `s for the searchable title string
             while ((code_pos = value_text.find("`")) && code_pos != value_text.npos) {
               value_text.replace(code_pos, 1, "");
             }
@@ -398,11 +410,23 @@ void append_bcd_feature_tree(
             out.write((char*)&len_title, 2);
             write_string_simd_padded(out, title_lower_buf, len_title);
 
+            // write links
+            uint32_t links_pos = out.tellp();
+            uint16_t len_link_mdn = mdn_url.size();
+            uint16_t len_link_spec = spec_url.size();
+            out.write((char*)&link_kind_mdn, 1);
+            out.write((char*)&len_link_mdn, 2);
+            out.write(mdn_url.data(), len_link_mdn);
+            out.write((char*)&link_kind_spec, 1);
+            out.write(spec_url.data(), len_link_spec);
+
             out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&key_pos, 4);
             out.write((char*)&title_pos, 4);
             out.write((char*)&title_lower_pos, 4);
-            // out.write(zeroes, 4); // description
+            out.write(zeroes, 4); // description
+            out.write((char*)&num_bcd_links, 1);
+            out.write((char*)&links_pos, 4);
 
             header_pos += HEADER_ENTRY_SIZE;
             break;
