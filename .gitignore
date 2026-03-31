@@ -20,6 +20,8 @@ go.work.sum
 .env
 
 # Taylor's additions
+update-data/*.json
+update-data/*.csv
 data
 go.sum
 whencaniuse
