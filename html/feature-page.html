@@ -20,9 +20,13 @@ Expected data shape: `Feature`
     </p>
   </div>
   <article id="links">
-    <h2>Links</h2>
+    <h2>Resources for this feature</h2>
     <ul>
       <li><a href="https://caniuse.com/{{ .Id }}" target="_blank">"{{ .Title }}" on caniuse.com</a></li>
+      {{range .Links}}
+        <span class="link-separator">|</span>
+        <li><a href="{{ .Href }}" target="_blank">{{ .Display }}</a></li>
+      {{end}}
     </ul>
   </article>
 </article>

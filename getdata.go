@@ -24,10 +24,10 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 	name := C.CString(strings.ToLower(query))
 	defer C.free(unsafe.Pointer(name))
 	res := C.search(name)
-	defer C.free_search_results(res.features, res.len)
+	defer C.free_search_results(res.data, res.len)
 
 	var html strings.Builder
-	for _, feature := range unsafe.Slice(res.features, res.len) {
+	for _, feature := range unsafe.Slice(res.data, res.len) {
 		id := C.GoString(feature.id)
 		title := encodeMdText(C.GoString(feature.title), false)
 		description := encodeMdText(C.GoString(feature.description), false)
@@ -44,6 +44,7 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 	return html.String()
 }
 
+// TODO: use C.GoStringN() instead of C.GoString()
 func GetFeatureHtmlFromId(id string) (string, error) {
 	c_id := C.CString(id)
 	defer C.free(unsafe.Pointer(c_id))
@@ -58,11 +59,30 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 		} else if strings.HasPrefix(id, "wf-") {
 			source = SourceKindWebFeatures
 		}
+		var links []Link
+		c_links := unsafe.Slice(c_feature.links.data, c_feature.links.len)
+		for _, c_link := range c_links {
+			display := "MDN"
+			fmt.Println("link kind:", c_link.kind)
+			switch c_link.kind {
+			case 0:
+				display = C.GoString(c_link.display)
+			case 1:
+				display = "MDN"
+			default:
+				display = "Specification"
+			}
+			links = append(links, Link{
+				Display: display,
+				Href:    C.GoString(c_link.href),
+			})
+		}
 		feature := &Feature{
 			id,
 			title,
 			description,
 			source,
+			links,
 		}
 		var featureContentStr strings.Builder
 		var html strings.Builder

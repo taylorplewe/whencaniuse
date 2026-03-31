@@ -23,11 +23,16 @@ const (
 	SourceKindWebFeatures
 )
 
+type Link struct {
+	Display string
+	Href    string
+}
 type Feature struct {
 	Id          string
 	Title       string
 	Description string
 	Source      SourceKind
+	Links       []Link
 }
 
 func main() {

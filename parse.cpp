@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -92,7 +93,7 @@ extern "C" SearchResult search(const char* query) {
   }
 
   return {
-    .features = features,
+    .data = features,
     .len = features_len, 
   };
 }
@@ -106,18 +107,44 @@ extern "C" Feature* get_feature_by_id(const char* id) {
   auto feature_data = feature_data_mem_region.load(std::memory_order_acquire);
   uint32_t addr_id,
            addr_title,
-           addr_description;
+           addr_description,
+           addr_links;
+  uint8_t num_links;
   for (int i = 0; i < num_features; i++) {
     const uint32_t seek = (i * HEADER_ENTRY_SIZE) + 4;
     addr_id          = *(uint32_t*)(feature_data->data + seek);
     addr_title       = *(uint32_t*)(feature_data->data + seek + 4);
     addr_description = *(uint32_t*)(feature_data->data + seek + 12);
+    num_links        = *(uint8_t*)(feature_data->data + seek + 16);
+    addr_links       = *(uint32_t*)(feature_data->data + seek + 17);
 
     if (strcmp(feature_data->data + addr_id + 2, id) == 0) {
+      // set links of feature
+      Link* links_data = nullptr;
+      if (num_links > 0) links_data = (Link*)malloc(num_links * sizeof(Link));
+      uint32_t link_seek = addr_links;
+      for (int i = 0; i < num_links; i++) {
+        links_data[i] = {
+          .kind    = (LinkKind)(*(uint8_t*)(feature_data->data + link_seek)),
+          .display = zeroes,
+          .href    = zeroes,
+        };
+        link_seek++;
+        if (links_data[i].kind == LinkKindString) {
+          uint16_t len_link_display = *(uint16_t*)(feature_data->data + link_seek);
+          links_data[i].display = feature_data->data + link_seek + 2;
+          link_seek += len_link_display + 3; // trailing 0
+        }
+        uint16_t len_link_href = *(uint16_t*)(feature_data->data + link_seek);
+        links_data[i].href = feature_data->data + link_seek + 2;
+        link_seek += len_link_href + 3; // trailing 0
+      }
+
       Feature* feature = new Feature{
         .id          = feature_data->data + 2 + addr_id,
         .title       = feature_data->data + 2 + addr_title,
         .description = feature_data->data + 2 + addr_description,
+        .links       = { .data = links_data, .len = num_links },
       };
       return feature;
     }
@@ -126,5 +153,6 @@ extern "C" Feature* get_feature_by_id(const char* id) {
   return nullptr;
 }
 extern "C" void free_feature(Feature* feature) {
+  if (feature->links.len) free(feature->links.data);
   delete feature;
 }

@@ -38,6 +38,7 @@ enum LinkKind {
   Mdn,
   Spec,
 };
+uint8_t link_kind_string = LinkKind::String;
 uint8_t link_kind_mdn = LinkKind::Mdn;
 uint8_t link_kind_spec = LinkKind::Spec;
 struct LinkString {
@@ -182,14 +183,13 @@ void process_caniuse_section(std::ofstream& out) {
         addr_links = out.tellp();
         uint8_t num_links = current_links.size();
         for (LinkString l : current_links) {
-          uint8_t link_kind = LinkKind::String;
           uint16_t len_display = l.display.size();
           uint16_t len_href = l.href.size();
-          out.write((char*)&link_kind, 1);
+          out.write((char*)&link_kind_string, 1);
           out.write((char*)&len_display, 2);
-          out.write(l.display.data(), l.display.size());
+          write_string(out, l.display.data(), len_display);
           out.write((char*)&len_href, 2);
-          out.write(l.href.data(), l.href.size());
+          write_string(out, l.href.data(), len_href);
         }
 
         out.seekp(header_pos, std::ios_base::beg);
@@ -424,9 +424,10 @@ void append_bcd_feature_tree(
             uint16_t len_link_spec = spec_url.size();
             out.write((char*)&link_kind_mdn, 1);
             out.write((char*)&len_link_mdn, 2);
-            out.write(mdn_url.data(), len_link_mdn);
+            write_string(out, mdn_url.data(), len_link_mdn);
             out.write((char*)&link_kind_spec, 1);
-            out.write(spec_url.data(), len_link_spec);
+            out.write((char*)&len_link_spec, 2);
+            write_string(out, spec_url.data(), len_link_spec);
 
             out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&key_pos, 4);
