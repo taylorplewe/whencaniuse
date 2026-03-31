@@ -34,7 +34,7 @@ if [ $? -ne 0 ]; then
   echo "$output" >> $LOG_FILE
 else
   tar xzf web-features*tgz*
-  mv package/data.json $WEB_FEATURES_DATA_DEST_FILE
+  mv -f package/data.json $WEB_FEATURES_DATA_DEST_FILE
   rm -rf package
   rm -rf web-features*tgz*
   echo "$(date) - downloaded web-features npm package data.json" >> $LOG_FILE
