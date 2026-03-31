@@ -52,6 +52,10 @@ void process_bcd_section(std::ofstream&);
 void process_web_features_section(std::ofstream&);
 void write_string(std::ofstream&, const char*, int);
 void write_string_simd_padded(std::ofstream&, char*, int);
+inline void str_replace_all_old_with_new(std::string&, const char*, const char*);
+
+// remove all backticks (`) from a std::string
+inline void str_remove_all_substr(std::string&, const char*);
 
 uint32_t num_features = 0;
 uint32_t header_pos = 0;
@@ -224,8 +228,6 @@ void append_bcd_feature_tree(
         simdjson::ondemand::object& compat_obj = sub_obj.value();
         // get feature's title and links
         std::string title = bcd_level_names.back();
-        // printf("title: %s\n", title.c_str());
-        // fflush(stdout);
         std::string mdn_url,
                     spec_url;
         for (auto compat_field : compat_obj) {
@@ -240,10 +242,6 @@ void append_bcd_feature_tree(
             mdn_url = std::string(compat_field.value().get_string().value());
           }
         }
-
-        // printf("mdn_url: %s\n", mdn_url.c_str());
-        // printf("spec_url: %s\n\n", spec_url.c_str());
-        // fflush(stdout);
 
         auto key_text = std::basic_string<char>("mdn-");
         for (int i = 0; i < bcd_level_names_lower.size(); i++) {
@@ -381,16 +379,8 @@ void append_bcd_feature_tree(
             num_features++;
             break;
           default:
-            // replace <code> and </code> with `
-            const size_t len_code = strlen("<code>");
-            const size_t len_code_slash = strlen("</code>");
-            size_t code_pos;
-            while ((code_pos = value_text.find("<code>")) && code_pos != value_text.npos) {
-              value_text.replace(code_pos, len_code, "`");
-            }
-            while ((code_pos = value_text.find("</code>")) && code_pos != value_text.npos) {
-              value_text.replace(code_pos, len_code_slash, "`");
-            }
+            str_replace_all_old_with_new(value_text, "<code>", "`");
+            str_replace_all_old_with_new(value_text, "</code>", "`");
 
             out.seekp(0, std::ios_base::end);
 
@@ -408,10 +398,7 @@ void append_bcd_feature_tree(
             write_string(out, value_text.data(), len_title);
 
             // write lowercased searchable title
-            // remove the `s for the searchable title string
-            while ((code_pos = value_text.find("`")) && code_pos != value_text.npos) {
-              value_text.replace(code_pos, 1, "");
-            }
+            str_remove_all_substr(value_text, "`");
             memcpy(title_lower_buf, value_text.data(), len_title);
             std::transform(title_lower_buf, title_lower_buf+len_title, title_lower_buf, ::tolower);
             uint32_t title_lower_pos = out.tellp();
@@ -519,6 +506,12 @@ void process_web_features_section(std::ofstream& out) {
         num_features++;
         break;
       default: {
+        str_replace_all_old_with_new(title_text, "<code>", "`");
+        str_replace_all_old_with_new(title_text, "</code>", "`");
+        str_replace_all_old_with_new(description_text, "<code>", "`");
+        str_replace_all_old_with_new(description_text, "</code>", "`");
+        str_replace_all_old_with_new(description_text, "&#x3C;", "<");
+
         out.seekp(0, std::ios_base::end);
 
         len_key = key_text.size();
@@ -534,6 +527,7 @@ void process_web_features_section(std::ofstream& out) {
         write_string(out, title_text.data(), len_title);
 
         uint32_t title_lower_pos = out.tellp();
+        str_remove_all_substr(title_text, "`");
         memcpy(title_lower_buf, title_text.data(), len_title);
         std::transform(title_lower_buf, title_lower_buf+len_title, title_lower_buf, ::tolower);
         out.write((char*)&len_title, 2);
@@ -568,5 +562,23 @@ void write_string_simd_padded(std::ofstream& out, char* data, int len) {
   out.write(zeroes, 1);
   if ((len + 1) % SIMD_VECTOR_SIZE != 0) {
     out.write(zeroes, SIMD_VECTOR_SIZE - ((len + 1)% SIMD_VECTOR_SIZE));
+  }
+}
+
+// replace <code> and </code> in a std::string with `
+inline void str_replace_all_old_with_new(std::string& str, const char* substr_old, const char* substr_new) {
+  const size_t len_substr_old = strlen(substr_old);
+  size_t code_pos;
+  while ((code_pos = str.find(substr_old)) && code_pos != str.npos) {
+    str.replace(code_pos, len_substr_old, substr_new);
+  }
+}
+
+// remove all backticks (`) from a std::string
+inline void str_remove_all_substr(std::string& str, const char* substr) {
+  const size_t len_substr = strlen(substr);
+  size_t code_pos;
+  while ((code_pos = str.find(substr)) && code_pos != str.npos) {
+    str.replace(code_pos, len_substr, "");
   }
 }

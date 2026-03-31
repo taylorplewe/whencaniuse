@@ -237,6 +237,8 @@ article#links {
   & > ul {
     display: inline-flex;
     gap: 8px;
+    flex-wrap: wrap;
+
     & > .link-separator {
       color: var(--col-text-faint);
     }
