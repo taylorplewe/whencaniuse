@@ -32,7 +32,19 @@ Expected data shape: `Feature`
 </article>
 
 <dialog id="watch-dialog" closedby="any">
-  <h1>Hello this is a dialog</h1>
+  <div class="msg-with-input">
+    <p>Notify me when <span class="feature-name">{{ .Title }}</span> hits</p>
+    <input
+      id="desired-support-threshold"
+      type="number"
+      value="90"
+      min="0"
+      max="100"
+      data-bind:desired-support-threshold
+      data-on:focus="el.select()"
+    >
+    <p>%</p>
+  </div>
   <div class="controls">
     <button command="close" commandfor="watch-dialog">Close</button>
     <button class="action">Add to my watch list!</button>

@@ -14,11 +14,13 @@
   --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l + 9));
   --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l + 12));
   --col-form-outline:     white;
-  --col-support:          #6abe30;
+  --col-support:          #80cd32;
   --col-code-bg:          #0004;
 
   --box-shadow-form-face-trim: inset 0 0 0 2px var(--col-form-face-trim);
   --box-shadow-card:           0 4px 8px #00000040;
+
+  --col-invalid: #633;
 
   --col-brand:                       #88d;
   --col-brand-hover:                 hsl(from var(--col-brand) h s calc(l + 12));
@@ -79,6 +81,9 @@ code {
 ::backdrop {
   background-color: rgba(0, 0, 0, .5);
 }
+::-webkit-inner-spin-button {
+  display: none; /* TODO see if you can style this just like the "X" on text inputs */
+}
 button {
   border: none;
   color: inherit;
@@ -101,6 +106,7 @@ button {
     display: grid;
     grid-template-columns: min-content 1fr;
     gap: 6px;
+    align-items: baseline;
 
     &::before {
       display: block;
@@ -120,6 +126,18 @@ button {
     opacity: 1;
   }
 }
+input {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background-color: var(--col-form-face);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  &:invalid {
+    background-color: var(--col-invalid);
+  }
+}
 dialog {
   border: none;
   border-radius: 8px;
@@ -131,6 +149,9 @@ dialog {
     display: flex;
     gap: 16px;
     justify-content: end;
+    &:not(:first-child) {
+      margin-top: 32px;
+    }
   }
 }
 
@@ -279,6 +300,11 @@ article#links {
     }
   }
 }
+dialog#watch-dialog {
+  input#desired-support-threshold {
+    width: 3em;
+  }
+}
 
 .split-items {
   display: flex;
@@ -302,6 +328,14 @@ article#links {
 .global-percentage-num {
   color: var(--col-support);
   font-weight: bold;
+}
+.msg-with-input {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  input {
+    margin-inline: 8px;
+  }
 }
 
 @media (max-width: 700px) {
