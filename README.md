@@ -21,8 +21,8 @@ go build
 
 ## Structure
 - The website portion is fully server-side-rendered via a Go web server which sends page updates via [Datastar](https://data-star.dev). Other than the aforementioned minified `datastar.js`, this site contains no Javascript.
-- Compatibility data ([`fulldata-json/data-2.0.json` from github.com/Fyrd/caniuse](https://raw.githubusercontent.com/Fyrd/caniuse/refs/heads/main/fulldata-json/data-2.0.json) (~4.5 MB) and [`data.json` from github.com/mdn/browser-compat-data](https://github.com/mdn/browser-compat-data) (~18.7MB)) is downloaded via a cronjob once a day to the server at 3:00 AM MDT. That cronjob then sends a signal (`SIGUSR1`) to the whencaniuse server telling it to update its data buffer with the new data.
-- Any time the aforementioned >22MB of JSON data is needed, it is parsed in C++ using [simdjson](https://simdjson.org/). The Go code communicates with the C++ code via [cgo](https://go.dev/wiki/cgo)
+- Compatibility data ([`fulldata-json/data-2.0.json` from github.com/Fyrd/caniuse](https://raw.githubusercontent.com/Fyrd/caniuse/refs/heads/main/fulldata-json/data-2.0.json) (~4.5 MB), [`data.json` from github.com/mdn/browser-compat-data](https://github.com/mdn/browser-compat-data) (~18.7MB), and [`data.json` from the `web-features` npm package](https://www.npmjs.com/package/web-features)) is downloaded via a cronjob once a day to the server at midnight MDT. A C++ program then parses all three data sources using [simdjson](https://simdjson.org) and generates one big, minimal binary data file containing all the data whencaniuse needs. That cronjob then sends a signal (`SIGUSR1`) to the whencaniuse server telling it to update its data buffer with the new data.
+- Any time the aforementioned combined binary data file is needed, it is searched in C++. The Go code communicates with the C++ code via [cgo](https://go.dev/wiki/cgo)
 - Current plan is to use Amazon SES for sending the emails
 
 ## Notes
