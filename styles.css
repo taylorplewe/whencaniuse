@@ -4,8 +4,6 @@
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 12pt;
 
-  --col-brand:            #88d;
-  --col-brand-hover:      hsl(from var(--col-brand) h s calc(l + 12));
   --col-visited:          rgb(from var(--col-brand) calc(r + 40) g calc(b + 40));
   --col-visited-hover:    hsl(from var(--col-visited) h s calc(l + 12));
   --col-bg:               #222120;
@@ -19,6 +17,13 @@
 
   --box-shadow-form-face-trim: inset 0 0 0 2px var(--col-form-face-trim);
   --box-shadow-card:           0 4px 8px #00000040;
+
+  --col-brand:                       #88d;
+  --col-brand-hover:                 hsl(from var(--col-brand) h s calc(l + 12));
+  --col-brand-form-face:             hsl(from var(--col-brand) h calc(s - 20) calc(l - 20));
+  --col-brand-form-face-trim:        hsl(from var(--col-brand-form-face) h s calc(l + 9));
+  --col-brand-form-face-hilite:      hsl(from var(--col-brand-form-face) h s calc(l + 12));
+  --box-shadow-brand-form-face-trim: inset 0 0 0 2px var(--col-brand-form-face-trim);
 }
 
 body {
@@ -69,6 +74,9 @@ code {
 ::selection {
   background-color: #777;
 }
+::backdrop {
+  background-color: rgba(0, 0, 0, .5);
+}
 button {
   border: none;
   color: inherit;
@@ -83,6 +91,21 @@ button {
     display: grid;
     grid-template-columns: min-content 1fr;
     gap: 6px;
+
+    &::before {
+      display: block;
+      content: "👁️";
+      height: 1em;
+      aspect-ratio: 1;
+    }
+  }
+
+  &.action {
+    background-color: var(--col-brand-form-face);
+    box-shadow: var(--box-shadow-card), var(--box-shadow-brand-form-face-trim);
+    &:hover {
+      background-color: var(--col-brand-form-face-hilite);
+    }
   }
 
   transition: box-shadow .2s,
@@ -94,12 +117,18 @@ button {
     box-shadow: var(--box-shadow-card);
     opacity: 1;
   }
+}
+dialog {
+  border: none;
+  border-radius: 8px;
+  background-color: var(--col-bg); /* a bizarre quirk is that if `inherit` is used for `background-color` here, it is darkened along with the actual background as if it were behind the backdrop */
+  color: inherit; /* the quirk described above does not occur for `color` */ 
+  padding: 2em;
 
-  &::before {
-    display: block;
-    content: "👁️";
-    height: 1em;
-    aspect-ratio: 1;
+  .controls {
+    display: flex;
+    gap: 16px;
+    justify-content: end;
   }
 }
 
