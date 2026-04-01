@@ -8,12 +8,14 @@
   --col-visited-hover:    hsl(from var(--col-visited) h s calc(l + 12));
   --col-bg:               #222120;
   --col-text:             #ccc;
+  --col-text-dim:         hsl(from var(--col-text) h s calc(l - 20));
   --col-text-faint:       hsl(from var(--col-text) h s calc(l - 36));
   --col-form-face:        hsl(from var(--col-bg) h s calc(l + 6));
   --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l + 9));
   --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l + 12));
   --col-form-outline:     white;
   --col-support:          #6abe30;
+  --col-code-bg:          #0004;
 
   --box-shadow-form-face-trim: inset 0 0 0 2px var(--col-form-face-trim);
   --box-shadow-card:           0 4px 8px #00000040;
@@ -67,7 +69,7 @@ h1, h2, h3, h4, h5, h6, p {
   word-break: break-word;
 }
 code {
-  background-color: #0004;
+  background-color: var(--col-code-bg);
   padding-inline: 6px;
   border-radius: 4px;
 }
@@ -87,6 +89,14 @@ button {
   padding: 8px 12px;
   border-radius: 4px;
 
+  &.action {
+    background-color: var(--col-brand-form-face);
+    box-shadow: var(--box-shadow-card), var(--box-shadow-brand-form-face-trim);
+    &:hover {
+      background-color: var(--col-brand-form-face-hilite);
+    }
+  }
+
   &.with-icon {
     display: grid;
     grid-template-columns: min-content 1fr;
@@ -94,17 +104,9 @@ button {
 
     &::before {
       display: block;
-      content: "👁️";
+      content: attr(icon);
       height: 1em;
       aspect-ratio: 1;
-    }
-  }
-
-  &.action {
-    background-color: var(--col-brand-form-face);
-    box-shadow: var(--box-shadow-card), var(--box-shadow-brand-form-face-trim);
-    &:hover {
-      background-color: var(--col-brand-form-face-hilite);
     }
   }
 
@@ -253,6 +255,10 @@ article#feature-content {
   ul#feature-search-results:not(:empty) + & {
     display: none;
   }
+
+  p#feature-description {
+    color: var(--col-text-dim);
+  }
 }
 
 article#links {
@@ -307,12 +313,15 @@ article#links {
 @media (prefers-color-scheme: light) {
   :root {
     --col-bg: white;
-    --col-text: #333;
+    --col-text: #444;
+    --col-text-dim:         hsl(from var(--col-text) h s calc(l + 16));
     --col-text-faint:       hsl(from var(--col-text) h s calc(l + 24));
     --col-form-face:        hsl(from var(--col-bg) h s calc(l - 6));
     --col-form-face-trim:   hsl(from var(--col-bg) h s calc(l - 9));
     --col-form-face-hilite: hsl(from var(--col-bg) h s calc(l - 12));
     --col-form-outline:     var(--col-brand);
+    --col-brand-form-face:  var(--col-brand);
+    --col-code-bg:          #0002;
   }
 
   form#feature-search {
