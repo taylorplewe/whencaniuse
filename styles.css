@@ -2,7 +2,9 @@
 
 :root {
   font-family: "IBM Plex Sans", sans-serif;
-  font-size: 12pt;
+
+  --base-font-size: 14pt;
+  font-size: var(--base-font-size);
 
   --col-visited:          rgb(from var(--col-brand) calc(r + 40) g calc(b + 40));
   --col-visited-hover:    hsl(from var(--col-visited) h s calc(l + 12));
@@ -78,9 +80,6 @@ code {
 ::selection {
   background-color: #777;
 }
-::backdrop {
-  background-color: rgba(0, 0, 0, .5);
-}
 ::-webkit-inner-spin-button {
   display: none; /* TODO see if you can style this just like the "X" on text inputs */
 }
@@ -125,6 +124,10 @@ button {
     box-shadow: var(--box-shadow-card);
     opacity: 1;
   }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 input {
   font-family: inherit;
@@ -151,6 +154,36 @@ dialog {
     justify-content: end;
     &:not(:first-child) {
       margin-top: 32px;
+    }
+  }
+
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    display 0.2s ease allow-discrete,
+    overlay 0.2s ease allow-discrete;
+  &::backdrop {
+    background-color: #0000;
+    backdrop-filter: blur(0px);
+    transition:
+      background-color 0.2s ease,
+      backdrop-filter 0.2s ease,
+      display 0.2s ease allow-discrete;
+  }
+  &[open] {
+    opacity: 1;
+    &::backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+    }
+  }
+}
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    &::backdrop {
+      background-color: #0000;
+      backdrop-filter: blur(0px);
     }
   }
 }
@@ -288,7 +321,7 @@ article#links {
   & > h2 {
     color: var(--col-text-faint);
     font-weight: normal;
-    font-size: 12pt;
+    font-size: var(--base-font-size);
   }
   & > ul {
     display: inline-flex;
@@ -300,11 +333,12 @@ article#links {
     }
   }
 }
-dialog#watch-dialog {
+form#watch-form {
   .msg-with-input {
     color: var(--col-text-dim);
     .feature-name {
       color: var(--col-text);
+      font-weight: bold;
     }
   }
   input#desired-support-threshold {
@@ -318,12 +352,6 @@ dialog#watch-dialog {
   align-items: baseline;
   flex-wrap: wrap;
 }
-/* @container (width <= 600px) { */
-  /* .split-items { */
-    
-  /* } */
-/* } */
-
 .faint {
   color: var(--col-text-faint);
 }

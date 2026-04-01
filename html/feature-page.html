@@ -32,21 +32,30 @@ Expected data shape: `Feature`
 </article>
 
 <dialog id="watch-dialog" closedby="any">
-  <div class="msg-with-input">
-    <p>Notify me when {{if lt (len .Title) 50}}<span class="feature-name">{{ .Title }}</span>{{else}}this feature{{end}} hits</p>
-    <input
-      id="desired-support-threshold"
-      type="number"
-      value="90"
-      min="0"
-      max="100"
-      data-bind:desired-support-threshold
-      data-on:focus="el.select()"
-    >
-    <p>%</p>
-  </div>
-  <div class="controls">
-    <button command="close" commandfor="watch-dialog">Close</button>
-    <button class="action">Add to my watch list!</button>
-  </div>
+  <form id="watch-form">
+    <div class="msg-with-input">
+      <p>Notify me when {{if lt (len .Title) 50}}<span class="feature-name">{{ .Title }}</span>{{else}}this feature{{end}} hits</p>
+      <input
+        id="desired-support-threshold"
+        type="number"
+        value="90"
+        min="0"
+        max="100"
+        data-bind:desired-support-threshold
+        data-on:focus="el.select()"
+      >
+      <p>%</p>
+    </div>
+    <div class="controls">
+      <button formmethod="dialog">Close</button>
+      <button
+        class="action"
+        type="button"
+        data-on:click="@post('https://idkafoiejioajwaofawjeoij.com')"
+        data-indicator:is-adding-to-watchlist
+        data-attr:disabled="$isAddingToWatchlist"
+        data-text="$isAddingToWatchlist ? 'Adding...' : 'Add to my watch list!'"
+      ></button>
+    </div>
+  </form>
 </dialog>
