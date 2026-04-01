@@ -33,7 +33,7 @@ Expected data shape: `Feature`
 
 <dialog id="watch-dialog" closedby="any">
   <div class="msg-with-input">
-    <p>Notify me when <span class="feature-name">{{ .Title }}</span> hits</p>
+    <p>Notify me when {{if lt (len .Title) 50}}<span class="feature-name">{{ .Title }}</span>{{else}}this feature{{end}} hits</p>
     <input
       id="desired-support-threshold"
       type="number"

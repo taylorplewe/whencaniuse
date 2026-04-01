@@ -129,7 +129,7 @@ button {
 input {
   font-family: inherit;
   font-size: inherit;
-  color: inherit;
+  color: var(--col-text);
   background-color: var(--col-form-face);
   border: none;
   border-radius: 4px;
@@ -301,6 +301,12 @@ article#links {
   }
 }
 dialog#watch-dialog {
+  .msg-with-input {
+    color: var(--col-text-dim);
+    .feature-name {
+      color: var(--col-text);
+    }
+  }
   input#desired-support-threshold {
     width: 3em;
   }
