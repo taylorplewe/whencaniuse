@@ -2,7 +2,10 @@
 Expected data: main content string
 */ -}}
 <!doctype html>
-<html>
+<html
+  data-signals:watchlist="sessionStorage.getItem('whencaniuse-watchlist') ? JSON.parse(sessionStorage.getItem('whencaniuse-watchlist')) : []"
+  data-effect="($watchlist.length + 1) && sessionStorage.setItem('whencaniuse-watchlist', JSON.stringify($watchlist))"
+>
   <head>
     <title>When can I use...</title>
     <script type="module" src="datastar.js"></script>
@@ -18,7 +21,7 @@ Expected data: main content string
           type="search"
           data-init="el.focus()"
           data-bind:search-value
-          data-on:input="@get('/feature-search')"
+          data-on:input="@get('/feature-search', {filterSignals: {include: /searchValue/}})"
         >
       </form>
       <div id="main-content"><ul id="feature-search-results"></ul>{{ . }}</div>

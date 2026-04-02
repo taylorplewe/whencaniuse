@@ -2,6 +2,7 @@
 Expected data shape: `Feature`
 */ -}}
 <article id="feature-content">
+  <h1 data-text="JSON.stringify($watchlist)"></h1>
   <div class="split-items">
     <h1>{{ .Title }}</h1>
     <p class="global-percentage"><span class="faint">Global</span> <span class="global-percentage-num">86%</span></p>
@@ -31,8 +32,8 @@ Expected data shape: `Feature`
   </article>
 </article>
 
-<dialog id="watch-dialog" closedby="any">
-  <form id="watch-form">
+<dialog id="watch-dialog" closedby="any" data-ref:watch-feature-dialog>
+  <form id="watch-form" data-ref:watch-feature-form>
     <div class="msg-with-input">
       <p>Notify me when {{if lt (len .Title) 50}}<span class="feature-name">{{ .Title }}</span>{{else}}this feature{{end}} hits</p>
       <input
@@ -51,11 +52,8 @@ Expected data shape: `Feature`
       <button
         class="action"
         type="button"
-        data-on:click="@post('https://idkafoiejioajwaofawjeoij.com')"
-        data-indicator:is-adding-to-watchlist
-        data-attr:disabled="$isAddingToWatchlist"
-        data-text="$isAddingToWatchlist ? 'Adding...' : 'Add to my watch list!'"
-      ></button>
+        data-on:click="$watchFeatureForm.checkValidity() && $watchlist.push({ '{{ .Title }}': $desiredSupportThreshold }) && $watchFeatureDialog.close()"
+      >Add to my watch list!</button>
     </div>
   </form>
 </dialog>
