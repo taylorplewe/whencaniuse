@@ -1,6 +1,8 @@
 #ifndef PARSE_NEW_H
 #define PARSE_NEW_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,6 +31,7 @@ typedef struct {
   char*    href;
 } Link;
 typedef struct {
+  uint32_t     index;
   char*        id;
   char*        title;
   char*        description;

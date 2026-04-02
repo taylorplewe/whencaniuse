@@ -28,6 +28,7 @@ type Link struct {
 	Href    string
 }
 type Feature struct {
+	Index       uint32
 	Id          string
 	Title       string
 	Description string

@@ -52,7 +52,19 @@ Expected data shape: `Feature`
       <button
         class="action"
         type="button"
-        data-on:click="$watchFeatureForm.checkValidity() && $watchlist.push({ '{{ .Title }}': $desiredSupportThreshold }) && $watchFeatureDialog.close()"
+        data-on:click="
+          $watchFeatureForm.checkValidity() &&
+          @post('/watchlist-add', {
+            payload: {
+              clientId: Number($clientId),
+              index:    {{ .Index }},
+              thresh:   $desiredSupportThreshold
+            }
+          }) &&
+          $watchFeatureDialog.close()"
+        data-indicator:is-adding-to-watchlist
+        data-attr:disabled="$isAddingToWatchlist"
+        data-text="$isAddingToWatchlist ? 'Adding...' : 'Add to my watch list!'"
       >Add to my watch list!</button>
     </div>
   </form>

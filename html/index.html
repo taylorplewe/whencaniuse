@@ -3,8 +3,8 @@ Expected data: main content string
 */ -}}
 <!doctype html>
 <html
-  data-signals:watchlist="sessionStorage.getItem('whencaniuse-watchlist') ? JSON.parse(sessionStorage.getItem('whencaniuse-watchlist')) : []"
-  data-effect="($watchlist.length + 1) && sessionStorage.setItem('whencaniuse-watchlist', JSON.stringify($watchlist))"
+  data-init="$clientId = sessionStorage.getItem('whencaniuse-client-id')"
+  data-effect="sessionStorage.setItem('whencaniuse-client-id', $clientId)"
 >
   <head>
     <title>When can I use...</title>
@@ -26,5 +26,11 @@ Expected data: main content string
       </form>
       <div id="main-content"><ul id="feature-search-results"></ul>{{ . }}</div>
     </main>
+    <aside
+      id="watchlist-pane"
+      popover
+      data-show="$watchlist.length"
+    >
+    </aside>
   </body>
 </html>

@@ -78,6 +78,7 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 			})
 		}
 		feature := &Feature{
+			uint32(c_feature.index),
 			id,
 			title,
 			description,

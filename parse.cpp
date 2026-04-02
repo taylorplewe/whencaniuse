@@ -110,7 +110,7 @@ extern "C" Feature* get_feature_by_id(const char* id) {
            addr_description,
            addr_links;
   uint8_t num_links;
-  for (int i = 0; i < num_features; i++) {
+  for (uint32_t i = 0; i < num_features; i++) {
     const uint32_t seek = (i * HEADER_ENTRY_SIZE) + 4;
     addr_id          = *(uint32_t*)(feature_data->data + seek);
     addr_title       = *(uint32_t*)(feature_data->data + seek + 4);
@@ -141,6 +141,7 @@ extern "C" Feature* get_feature_by_id(const char* id) {
       }
 
       Feature* feature = new Feature{
+        .index       = i,
         .id          = feature_data->data + 2 + addr_id,
         .title       = feature_data->data + 2 + addr_title,
         .description = feature_data->data + 2 + addr_description,
