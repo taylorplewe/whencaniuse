@@ -96,7 +96,7 @@ button {
   &.action {
     background-color: var(--col-brand-form-face);
     box-shadow: var(--box-shadow-card), var(--box-shadow-brand-form-face-trim);
-    &:hover {
+    &:not(:disabled):hover {
       background-color: var(--col-brand-form-face-hilite);
     }
   }
@@ -119,7 +119,7 @@ button {
     background-color .2s,
     opacity .2s;
   box-shadow: var(--box-shadow-card), var(--box-shadow-form-face-trim);
-  &:hover {
+  &:not(:disabled):hover {
     background-color: var(--col-form-face-hilite);
     box-shadow: var(--box-shadow-card);
     opacity: 1;
