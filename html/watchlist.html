@@ -16,6 +16,6 @@ Expected data shape:
       hits
       <span class="watchlist-feature-thresh">{{ .DesiredSupportThreshold }}%</span>
     </p>
-    <button data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})"></button>
+    <button class="watchlist-feature-remove" data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})"></button>
   </li>
 {{end}}
