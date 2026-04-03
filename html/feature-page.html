@@ -52,14 +52,14 @@ Expected data shape: `Feature`
         class="action"
         type="button"
         data-on:click="
-          $watchFeatureForm.checkValidity() &&
+          $watchFeatureForm.checkValidity();
           @post('/watchlist-add', {
             payload: {
               clientId: Number($clientId),
               index:    {{ .Index }},
               thresh:   $desiredSupportThreshold
             }
-          }) &&
+          });
           $watchFeatureDialog.close()"
         data-indicator:is-adding-to-watchlist
         data-attr:disabled="$isAddingToWatchlist"

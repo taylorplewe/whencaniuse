@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -19,6 +20,10 @@ const (
 	SourceKindWebFeatures
 )
 
+type IndexData struct {
+	MainContent      string
+	WatchlistContent string
+}
 type Link struct {
 	Display string
 	Href    string
@@ -74,15 +79,23 @@ func serve(w http.ResponseWriter, req *http.Request) {
 
 	switch trimmedUrl {
 	case "":
-		Templates[TemplateIndex].Template.Execute(w, `<ul id="feature-search-results"></ul>`)
+		Templates[TemplateIndex].Template.Execute(w, IndexData{
+			`<ul id="feature-search-results"></ul>`,
+			"",
+		})
 		// http.ServeFile(w, req, "index.html")
 	default:
 		if strings.ContainsRune(trimmedUrl, '.') {
 			http.ServeFile(w, req, trimmedUrl)
 		} else {
-			html, err := GetFeatureHtmlFromId(trimmedUrl)
+			query := req.URL.Query()
+			clientId, _ := strconv.Atoi(query.Get("cid"))
+			html, err := GetFeatureHtmlFromId(trimmedUrl, ClientId(clientId))
 			if err != nil {
-				Templates[TemplateIndex].Template.Execute(w, fmt.Sprintf(`<p class="error">No feature found with ID '%s'`, trimmedUrl))
+				Templates[TemplateIndex].Template.Execute(w, fmt.Sprintf(`<p class="error">No feature found with ID '%s'`, IndexData{
+					trimmedUrl,
+					"",
+				}))
 			} else {
 				w.Write([]byte(html))
 			}

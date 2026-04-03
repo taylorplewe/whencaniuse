@@ -42,6 +42,7 @@ body {
   color: var(--col-text);
   height: 100vh;
   box-sizing: border-box;
+  overflow: hidden;
 }
 main {
   margin: 64px auto 0 auto;
@@ -206,6 +207,7 @@ dialog {
 aside#watchlist-pane {
   background-color: var(--col-bg-dark);
   padding: 1rem;
+  min-width: 24em;
 
   display: flex;
   flex-direction: column;
@@ -225,6 +227,9 @@ aside#watchlist-pane {
       padding: 1em;
       border-radius: 4px;
       color: var(--col-text-dim);
+      .watchlist-feature-label {
+        flex-grow: 1;
+      }
       .watchlist-feature-title {
         color: var(--col-text);
       }
@@ -245,8 +250,11 @@ aside#watchlist-pane {
     }
   }
 
+  translate: 0;
+  transition: translate 0.4s ease;
   &:has(ul#watchlist-feature-list:empty) {
-    display: none;
+    /* display: none; */
+    translate: 100%;
   }
 }
 label[for="search-input"] {

@@ -45,14 +45,14 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 }
 
 // TODO: use C.GoStringN() instead of C.GoString()
-func GetFeatureHtmlFromId(id string) (string, error) {
-	c_id := C.CString(id)
-	defer C.free(unsafe.Pointer(c_id))
-	c_feature := C.get_feature_by_id(c_id)
-	if c_feature != nil {
-		defer C.free_feature(c_feature)
-		title := encodeMdText(C.GoString(c_feature.title), true)
-		description := encodeMdText(C.GoString(c_feature.description), true)
+func GetFeatureHtmlFromId(id string, clientId ClientId) (string, error) {
+	cId := C.CString(id)
+	defer C.free(unsafe.Pointer(cId))
+	cFeature := C.get_feature_by_id(cId)
+	if cFeature != nil {
+		defer C.free_feature(cFeature)
+		title := encodeMdText(C.GoString(cFeature.title), true)
+		description := encodeMdText(C.GoString(cFeature.description), true)
 		source := SourceKindCaniuse
 		if strings.HasPrefix(id, "mdn-") {
 			source = SourceKindMdn
@@ -60,13 +60,13 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 			source = SourceKindWebFeatures
 		}
 		var links []Link
-		c_links := unsafe.Slice(c_feature.links.data, c_feature.links.len)
-		for _, c_link := range c_links {
+		cLinks := unsafe.Slice(cFeature.links.data, cFeature.links.len)
+		for _, cLink := range cLinks {
 			display := "MDN"
-			fmt.Println("link kind:", c_link.kind)
-			switch c_link.kind {
+			fmt.Println("link kind:", cLink.kind)
+			switch cLink.kind {
 			case 0:
-				display = C.GoString(c_link.display)
+				display = C.GoString(cLink.display)
 			case 1:
 				display = "MDN"
 			default:
@@ -74,21 +74,25 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 			}
 			links = append(links, Link{
 				Display: display,
-				Href:    C.GoString(c_link.href),
+				Href:    C.GoString(cLink.href),
 			})
 		}
 		feature := &Feature{
-			uint32(c_feature.index),
+			uint32(cFeature.index),
 			id,
 			title,
 			description,
 			source,
 			links,
 		}
-		var featureContentStr strings.Builder
+		watchlistHtml := GetWatchlistHtmlFromClientId(clientId)
+		var featureContentHtml strings.Builder
 		var html strings.Builder
-		_ = Templates[TemplateFeaturePage].Template.Execute(&featureContentStr, feature)
-		_ = Templates[TemplateIndex].Template.Execute(&html, featureContentStr.String())
+		_ = Templates[TemplateFeaturePage].Template.Execute(&featureContentHtml, feature)
+		_ = Templates[TemplateIndex].Template.Execute(&html, IndexData{
+			featureContentHtml.String(),
+			watchlistHtml,
+		})
 		return html.String(), nil
 	} else {
 		return "", fmt.Errorf("Could not find feature with ID '%s'", id)

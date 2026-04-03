@@ -30,28 +30,22 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request, url string
 
 		fmt.Println("parsed body", params)
 
+		var watchlist *Watchlist
 		sse := datastar.NewSSE(w, req)
-		var html string
-		if params.ClientId == 0 {
-			fmt.Println("new client!")
-			watchlist := Watchlist{{params.FeatureIndex: params.SupportThreshold}}
-			newId := AddNewClient(watchlist)
-			sse.MarshalAndPatchSignals(map[string]ClientId{"clientId": newId})
-			html = GetWatchlistFeaturesHtml(&watchlist)
-		} else {
-			client, exists := Clients[params.ClientId]
-			if !exists {
-				fmt.Printf("ERROR: client with ID %d not found!\n", params.ClientId)
-				w.WriteHeader(400)
-				w.Write([]byte("Client with your client ID was not found!"))
-				return
-			}
-			client.Watchlist = append(client.Watchlist, map[uint]uint{params.FeatureIndex: params.SupportThreshold})
-			html = GetWatchlistFeaturesHtml(&client.Watchlist)
+		client, exists := Clients[params.ClientId]
+		if !exists {
+			fmt.Printf("ERROR: client with ID %d not found! Resetting client\n", params.ClientId)
 		}
-		sse.PatchElementf(`<ul id="watchlist-feature-list">%s</ul>`, html)
-		// send back updated watchlist HTML
-		PrintClients()
+		if params.ClientId == 0 || !exists {
+			fmt.Println("new client!")
+			watchlist = &Watchlist{{params.FeatureIndex: params.SupportThreshold}}
+			newId := AddNewClient(*watchlist)
+			sse.MarshalAndPatchSignals(map[string]ClientId{"clientId": newId})
+		} else {
+			client.Watchlist = append(client.Watchlist, map[uint]uint{params.FeatureIndex: params.SupportThreshold})
+			watchlist = &client.Watchlist
+		}
+		patchWatchlistHtml(sse, watchlist)
 	case "watchlist-remove":
 		type WatchlistRemoveParams struct {
 			ClientId     ClientId `json:"clientId"`
@@ -76,12 +70,21 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request, url string
 			}
 			return false
 		})
-		var html string
-		if len(client.Watchlist) > 0 {
-			html = GetWatchlistFeaturesHtml(&client.Watchlist)
+		sse := datastar.NewSSE(w, req)
+		patchWatchlistHtml(sse, &client.Watchlist)
+	case "watchlist-get":
+		type WatchlistGetParams struct {
+			ClientId ClientId `json:"clientId"`
 		}
 		sse := datastar.NewSSE(w, req)
-		sse.PatchElementf(`<ul id="watchlist-feature-list">%s</ul>`, html)
+		params := &WatchlistGetParams{}
+		if err := datastar.ReadSignals(req, &params); err != nil {
+			w.WriteHeader(400)
+			fmt.Println("ERROR: could not unmarshall datastar signals into params object:", err)
+			return
+		}
+
+		patchWatchlistHtmlFromClientId(sse, params.ClientId)
 	case "feature-search":
 		type FeatureSearchParams struct {
 			SearchValue string `json:"searchValue"`
@@ -120,5 +123,34 @@ func getDatastarCustomPayload(req *http.Request, params any) error {
 	if err = json.Unmarshal(bodyBytes, &params); err != nil {
 		return err
 	}
+	return nil
+}
+
+// Watchlist helper functions
+
+func GetWatchlistHtml(watchlist *Watchlist) string {
+	var html string
+	if len(*watchlist) > 0 {
+		html = GetWatchlistFeaturesHtml(watchlist)
+	}
+	return html
+}
+func patchWatchlistHtml(sse *datastar.ServerSentEventGenerator, watchlist *Watchlist) {
+	sse.PatchElementf(`<ul id="watchlist-feature-list">%s</ul>`, GetWatchlistHtml(watchlist))
+}
+func GetWatchlistHtmlFromClientId(clientId ClientId) string {
+	client, exists := Clients[clientId]
+	if !exists {
+		return ""
+	}
+	return GetWatchlistHtml(&client.Watchlist)
+}
+func patchWatchlistHtmlFromClientId(sse *datastar.ServerSentEventGenerator, clientId ClientId) error {
+	client, exists := Clients[clientId]
+	if !exists {
+		sse.MarshalAndPatchSignals(map[string]ClientId{"clientId": 0})
+		return fmt.Errorf("no client found with ID %d", clientId)
+	}
+	patchWatchlistHtml(sse, &client.Watchlist)
 	return nil
 }

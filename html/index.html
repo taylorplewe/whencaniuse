@@ -1,10 +1,15 @@
 {{- /*
-Expected data: main content string
+Expected data: `IndexData`
 */ -}}
 <!doctype html>
 <html
-  data-init="$clientId = sessionStorage.getItem('whencaniuse-client-id')"
-  data-effect="sessionStorage.setItem('whencaniuse-client-id', $clientId)"
+  data-init="
+    ($clientId = Number(sessionStorage.getItem('whencaniuse-client-id')))
+  "
+  data-on-signal-patch="
+    sessionStorage.setItem('whencaniuse-client-id', $clientId);
+    history.replaceState(null, '', [window.location.pathname, $clientId].filter(Boolean).join('?cid='))"
+  data-on-signal-patch-filter="{include: /clientId/}"
 >
   <head>
     <title>When can I use...</title>
@@ -25,12 +30,12 @@ Expected data: main content string
             data-on:input="@get('/feature-search', {filterSignals: {include: /searchValue/}})"
           >
         </form>
-        <div id="main-content"><ul id="feature-search-results"></ul>{{ . }}</div>
+        <div id="main-content"><ul id="feature-search-results"></ul>{{ .MainContent }}</div>
       </main>
       <footer>&copy; 2026 Taylor Plewe | <a href="https://github.com/taylorplewe/whencaniuse" target="_blank">source code</a> | <a href="mailto:tplewe@outlook.com">contact</a></footer>
     </div>
     <aside id="watchlist-pane">
-      <ul id="watchlist-feature-list"></ul>
+      <ul id="watchlist-feature-list">{{ .WatchlistContent }}</ul>
       <label for="email-input">Email address</label>
       <input id="email-input" data-bind:email>
       <button class="action with-icon" icon="📭" data-on:click="@post('/submit', {filterSignals: {include: /clientId/}})">Notify me!</button>
