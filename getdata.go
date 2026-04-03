@@ -95,6 +95,38 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 	}
 }
 
+func GetWatchlistFeaturesHtml(list *Watchlist) string {
+	// C++ side just wants a list of u32 IDs
+	var featureIndexes []uint32
+	for _, mapping := range *list {
+		for id := range mapping {
+			featureIndexes = append(featureIndexes, uint32(id))
+		}
+	}
+
+	cWatchlistTitles := C.get_watchlist_titles((*C.uint)(unsafe.Pointer(&featureIndexes[0])), C.int(len(featureIndexes)))
+	defer C.free_watchlist_titles(cWatchlistTitles.data)
+	var features []WatchlistFeature
+	for i, title := range unsafe.Slice(cWatchlistTitles.data, cWatchlistTitles.len) {
+		var desiredSupportThreshold uint
+		for _, thresh := range (*list)[i] {
+			desiredSupportThreshold = thresh
+		}
+		features = append(features, WatchlistFeature{
+			featureIndexes[i],
+			C.GoString(title),
+			desiredSupportThreshold,
+		})
+		// watchlistTitles = append(watchlistTitles, C.GoString(title))
+	}
+
+	var html strings.Builder
+
+	_ = Templates[TemplateWatchlist].Template.Execute(&html, &features)
+
+	return html.String()
+}
+
 func encodeMdText(text string, shouldRenderATags bool) string {
 	htmlEscapedText := html.EscapeString(text)
 	return encodeLinks(encodeCodeBlocks(htmlEscapedText), shouldRenderATags)

@@ -38,11 +38,15 @@ typedef struct {
   FatPtr(Link) links;
 } Feature;
 
-void         reload_caniuse_data();
-SearchResult search(const char*);
-void         free_search_results(FeatureSimple*, int);
-Feature*     get_feature_by_id(const char*);
-void         free_feature(Feature*);
+typedef FatPtr(char*) GetWatchlistTitlesResult;
+
+void                     reload_caniuse_data();
+SearchResult             search(const char*);
+void                     free_search_results(FeatureSimple*, int);
+Feature*                 get_feature_by_id(const char*);
+void                     free_feature(Feature*);
+GetWatchlistTitlesResult get_watchlist_titles(const unsigned int[], const int);
+void                     free_watchlist_titles(char**);
 
 #ifdef __cplusplus
 }

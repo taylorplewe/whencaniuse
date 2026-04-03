@@ -203,6 +203,14 @@ dialog {
 
 aside#watchlist-pane {
   background-color: var(--col-bg-dark);
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  & > ul#watchlist-feature-list {
+    flex-grow: 1;
+  }
 }
 label[for="search-input"] {
   display: block;

@@ -31,6 +31,11 @@ type Feature struct {
 	Source      SourceKind
 	Links       []Link
 }
+type WatchlistFeature struct {
+	Index                   uint32
+	Title                   string
+	DesiredSupportThreshold uint
+}
 
 func main() {
 	httpServer := http.Server{

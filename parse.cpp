@@ -157,3 +157,23 @@ extern "C" void free_feature(Feature* feature) {
   if (feature->links.len) free(feature->links.data);
   delete feature;
 }
+
+extern "C" GetWatchlistTitlesResult get_watchlist_titles(const unsigned int indexes[], const int num_features) {
+  auto titles = (char**)malloc(num_features * sizeof(char*));
+  auto feature_data = feature_data_mem_region.load(std::memory_order_acquire);
+
+  uint32_t addr_title;
+  #define TITLE_ADDR_OFFSET 4
+  for (int i = 0; i < num_features; i++) {
+    addr_title = *(uint32_t*)(feature_data->data + (indexes[i] * HEADER_ENTRY_SIZE) + 4 /* u32 number of features */ + TITLE_ADDR_OFFSET);
+    titles[i] = feature_data->data + addr_title + 2;
+  }
+
+  return {
+    .data = titles,
+    .len = num_features,
+  };
+}
+extern "C" void free_watchlist_titles(char** titles) {
+  free(titles);
+}

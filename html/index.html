@@ -29,6 +29,11 @@ Expected data: main content string
       </main>
       <footer>&copy; 2026 Taylor Plewe | <a href="https://github.com/taylorplewe/whencaniuse" target="_blank">source code</a> | <a href="mailto:tplewe@outlook.com">contact</a></footer>
     </div>
-    <aside id="watchlist-pane"></aside>
+    <aside id="watchlist-pane">
+      <ul id="watchlist-feature-list"></ul>
+      <label for="email-input">Email address</label>
+      <input id="email-input" data-bind:email>
+      <button class="with-icon" icon="📭" data-on:click="@post('/submit', {filterSignals: {include: /clientId/}})">Notify me!</button>
+    </aside>
   </body>
 </html>
