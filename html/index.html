@@ -13,24 +13,22 @@ Expected data: main content string
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    <main>
-      <label for="search-input"><em>When</em> can I use...</label>
-      <form id="feature-search">
-        <input
-          id="search-input"
-          type="search"
-          data-init="el.focus()"
-          data-bind:search-value
-          data-on:input="@get('/feature-search', {filterSignals: {include: /searchValue/}})"
-        >
-      </form>
-      <div id="main-content"><ul id="feature-search-results"></ul>{{ . }}</div>
-    </main>
-    <aside
-      id="watchlist-pane"
-      popover
-      data-show="$watchlist.length"
-    >
-    </aside>
+    <div id="main-and-footer">
+      <main>
+        <label for="search-input"><em>When</em> can I use...</label>
+        <form id="feature-search">
+          <input
+            id="search-input"
+            type="search"
+            data-init="el.focus()"
+            data-bind:search-value
+            data-on:input="@get('/feature-search', {filterSignals: {include: /searchValue/}})"
+          >
+        </form>
+        <div id="main-content"><ul id="feature-search-results"></ul>{{ . }}</div>
+      </main>
+      <footer>&copy; 2026 Taylor Plewe | <a href="https://github.com/taylorplewe/whencaniuse" target="_blank">source code</a></footer>
+    </div>
+    <aside id="watchlist-pane"></aside>
   </body>
 </html>
