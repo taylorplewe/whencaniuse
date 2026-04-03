@@ -1,0 +1,25 @@
+{{- /*
+Expected data shape:
+[
+  {
+    Id uint
+    Title string
+    DesiredSupportThreshold uint
+  }
+  ...
+]
+*/ -}}
+<ul id="watchlist-feature-list">
+  {{range . }}
+    <li>
+      <p class="watchlist-feature-label">
+        <span class="watchlist-feature-title">{{ .Title }}</span>
+        hits
+        <span class="watchlist-feature-thresh">{{ .DesiredSupportThreshold }}%</span>
+      </p>
+      <button data-on:click="@post('/watchlist-remove', {payload:{clientId: $clientId, featureId: {{ .Id }} }})"></button>
+    </li>
+  {{end}}
+</ul>
+<input id="email-input" data-bind:email>
+<button class="with-icon" icon="📭" data-on:click="@post('/submit', {filterSignals: {include: /clientId/}})">Notify me!</button>

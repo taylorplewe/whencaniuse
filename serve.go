@@ -7,13 +7,9 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"text/template"
 )
 
 var ShouldReloadCaniuseData chan os.Signal = make(chan os.Signal, 1)
-
-var templateIndex *template.Template
-var templateFeaturePage *template.Template
 
 type SourceKind uint
 
@@ -52,20 +48,10 @@ func main() {
 	}()
 	ReloadCaniuseData()
 
-	var err error
-	templateIndex, err = template.ParseFiles("html/index.html")
-	if err != nil {
-		fmt.Println("could not parse html/index.html")
-		return
-	}
-	templateFeaturePage, err = template.ParseFiles("html/feature-page.html")
-	if err != nil {
-		fmt.Println("could not parse html/index.html")
-		return
-	}
+	InitTemplates()
 
 	fmt.Println("Listening on port 1999...")
-	err = httpServer.ListenAndServe()
+	err := httpServer.ListenAndServe()
 	if err != nil {
 		fmt.Println("An error occurred:", err)
 	}
@@ -75,8 +61,6 @@ func serve(w http.ResponseWriter, req *http.Request) {
 	trimmedUrl := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/")
 
 	fmt.Println()
-	// fmt.Printf("req.URL: '%s'\n", req.URL)
-	// fmt.Printf("req.URL trimmed: '%s'\n", trimmedUrl)
 
 	if req.Header.Get("Datastar-Request") == "true" {
 		HandleDatastarRequests(w, req, trimmedUrl)
@@ -85,7 +69,7 @@ func serve(w http.ResponseWriter, req *http.Request) {
 
 	switch trimmedUrl {
 	case "":
-		templateIndex.Execute(w, `<ul id="feature-search-results"></ul>`)
+		Templates[TemplateIndex].Template.Execute(w, `<ul id="feature-search-results"></ul>`)
 		// http.ServeFile(w, req, "index.html")
 	default:
 		if strings.ContainsRune(trimmedUrl, '.') {
@@ -93,7 +77,7 @@ func serve(w http.ResponseWriter, req *http.Request) {
 		} else {
 			html, err := GetFeatureHtmlFromId(trimmedUrl)
 			if err != nil {
-				templateIndex.Execute(w, fmt.Sprintf(`<p class="error">No feature found with ID '%s'`, trimmedUrl))
+				Templates[TemplateIndex].Template.Execute(w, fmt.Sprintf(`<p class="error">No feature found with ID '%s'`, trimmedUrl))
 			} else {
 				w.Write([]byte(html))
 			}

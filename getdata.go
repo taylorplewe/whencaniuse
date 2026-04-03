@@ -87,8 +87,8 @@ func GetFeatureHtmlFromId(id string) (string, error) {
 		}
 		var featureContentStr strings.Builder
 		var html strings.Builder
-		_ = templateFeaturePage.Execute(&featureContentStr, feature)
-		_ = templateIndex.Execute(&html, featureContentStr.String())
+		_ = Templates[TemplateFeaturePage].Template.Execute(&featureContentStr, feature)
+		_ = Templates[TemplateIndex].Template.Execute(&html, featureContentStr.String())
 		return html.String(), nil
 	} else {
 		return "", fmt.Errorf("Could not find feature with ID '%s'", id)
