@@ -36,9 +36,9 @@
 body {
   background-color: var(--col-bg);
   margin: 0;
-  /* display: grid; */
-  /* grid-template-columns: 3fr 1fr; */
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  /* display: flex; */
   color: var(--col-text);
   height: 100vh;
   box-sizing: border-box;
@@ -46,7 +46,8 @@ body {
 }
 main {
   margin: 64px auto 0 auto;
-  width: 60%;
+  width: 100%;
+  box-sizing: border-box;
   max-width: 768px;
   flex-grow: 1;
 }
@@ -111,8 +112,8 @@ button {
   }
 
   &.with-icon {
-    display: grid;
-    grid-template-columns: min-content 1fr;
+    display: flex;
+    justify-content: center;
     gap: 6px;
     align-items: baseline;
 
@@ -198,7 +199,7 @@ dialog {
 }
 
 #main-and-footer {
-  flex-grow: 1;
+  grid-column-start: 2;
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -207,7 +208,8 @@ dialog {
 aside#watchlist-pane {
   background-color: var(--col-bg-dark);
   padding: 1rem;
-  min-width: 24em;
+  width: 100%;
+  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
