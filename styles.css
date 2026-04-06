@@ -428,7 +428,8 @@ article#links {
     }
   }
 }
-form#watch-form {
+form#watch-form,
+form#watch-edit-form {
   .msg-with-input {
     color: var(--col-text-dim);
     .feature-name {
