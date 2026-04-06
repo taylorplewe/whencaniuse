@@ -46,6 +46,39 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request, url string
 			watchlist = &client.Watchlist
 		}
 		patchWatchlistHtml(sse, watchlist)
+	case "watchlist-edit":
+		type WatchlistEditParams struct {
+			ClientId         ClientId `json:"clientId"`
+			FeatureIndex     uint     `json:"index"`
+			SupportThreshold uint     `json:"thresh"`
+		}
+		params := &WatchlistEditParams{}
+		if err := getDatastarCustomPayload(req, params); err != nil {
+			fmt.Println("Could not get params from 'watchlist-add' request body!", err)
+		}
+
+		sse := datastar.NewSSE(w, req)
+		client, exists := Clients[params.ClientId]
+		if !exists {
+			fmt.Printf("ERROR: client with ID %d not found!\n", params.ClientId)
+			w.WriteHeader(400)
+			w.Write([]byte("Client with your client ID was not found!"))
+			return
+		}
+		watchlist := &client.Watchlist
+
+		// do the edit
+		featureIndexInWatchlist := slices.IndexFunc(*watchlist, func(mapping map[uint]uint) bool {
+			for id := range mapping {
+				if id == params.FeatureIndex {
+					return true
+				}
+			}
+			return false
+		})
+		(*watchlist)[featureIndexInWatchlist][params.FeatureIndex] = params.SupportThreshold
+
+		patchWatchlistHtml(sse, watchlist)
 	case "watchlist-remove":
 		type WatchlistRemoveParams struct {
 			ClientId     ClientId `json:"clientId"`

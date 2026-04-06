@@ -16,10 +16,25 @@ Expected data shape:
       <p>
         hits
         <span class="watchlist-feature-thresh">{{ .DesiredSupportThreshold }}%</span>
+        (currently 66%)
       </p>
       <div class="watchlist-feature-controls">
-        <button class="noface icon edit" aria-label="Edit rule"></button>
-        <button class="noface icon remove" data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})" aria-label="Remove rule"></button>
+        <button
+          class="noface icon edit"
+          title="Edit rule"
+          command="show-modal"
+          commandfor="watch-edit-dialog"
+          data-on:click="
+            $editingRuleIndex = {{ .Index }};
+            $editingRuleTitle = '{{ .Title }}';
+            $editingRuleThresh = {{ .DesiredSupportThreshold }};
+          "
+        ></button>
+        <button
+          class="noface icon remove"
+          title="Remove rule"
+          data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})"
+        ></button>
       </div>
     </div>
   </li>

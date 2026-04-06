@@ -24,7 +24,7 @@ Expected data shape: `Feature`
     <ul>
       <li><a href="https://caniuse.com/{{ .Id }}" target="_blank">"{{ .Title }}" on caniuse.com</a></li>
       {{range .Links}}
-        <li><span class="link-separator">|</span></li>
+        <li><span class="link-separator">|</span></li> <!-- TODO: try `li + li::before { content: "|" }` -->
         <li><a href="{{ .Href }}" target="_blank">{{ .Display }}</a></li>
       {{end}}
     </ul>
@@ -64,7 +64,7 @@ Expected data shape: `Feature`
         data-indicator:is-adding-to-watchlist
         data-attr:disabled="$isAddingToWatchlist"
         data-text="$isAddingToWatchlist ? 'Adding...' : 'Add to my watch list!'"
-      >Add to my watch list!</button>
+      ></button>
     </div>
   </form>
 </dialog>
