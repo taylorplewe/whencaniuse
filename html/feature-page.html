@@ -8,7 +8,13 @@ Expected data shape: `Feature`
   </div>
   {{if .Description}}<p id="feature-description">{{ .Description }}</p>{{end}}
   <div class="split-items">
-    <button class="with-icon" command="show-modal" commandfor="watch-dialog" icon="👁️">Watch this feature</button>
+    <div id="watch-feature-button-container">
+      {{ if .IsInWatchlist }}
+        <p>✅ Already in watchlist</p>
+      {{ else }}
+        <button class="with-icon" command="show-modal" commandfor="watch-dialog" icon="👁️">Watch this feature</button>
+      {{ end}}
+    </div>
     <p><span class="faint">Source:</span>
       {{if eq .Source 0}}
         caniuse.com

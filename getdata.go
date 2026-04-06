@@ -83,6 +83,7 @@ func GetFeatureHtmlFromId(id string, clientId ClientId) (string, error) {
 			title,
 			description,
 			source,
+			false, // TODO set this properly
 			links,
 		}
 		watchlistHtml := GetWatchlistHtmlFromClientId(clientId)

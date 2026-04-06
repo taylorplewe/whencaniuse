@@ -262,6 +262,7 @@ aside#watchlist-pane {
       }
       .watchlist-feature-title {
         color: var(--col-text);
+        font-weight: bold;
       }
       .watchlist-feature-thresh {
         color: var(--col-support);

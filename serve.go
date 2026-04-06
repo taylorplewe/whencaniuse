@@ -29,12 +29,13 @@ type Link struct {
 	Href    string
 }
 type Feature struct {
-	Index       uint32
-	Id          string
-	Title       string
-	Description string
-	Source      SourceKind
-	Links       []Link
+	Index         uint32
+	Id            string
+	Title         string
+	Description   string
+	Source        SourceKind
+	IsInWatchlist bool
+	Links         []Link
 }
 type WatchlistFeature struct {
 	Index                   uint32
