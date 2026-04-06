@@ -11,11 +11,19 @@ Expected data shape:
 */ -}}
 {{range . }}
   <li>
-    <p class="watchlist-feature-label">
-      <span class="watchlist-feature-title">{{ .Title }}</span>
-      hits
-      <span class="watchlist-feature-thresh">{{ .DesiredSupportThreshold }}%</span>
-    </p>
-    <button class="watchlist-feature-remove" data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})"></button>
+    <p class="watchlist-feature-title">{{ .Title }}</p>
+    <div class="watchlist-feature-bottom">
+      <p>
+        hits
+        <span class="watchlist-feature-thresh">{{ .DesiredSupportThreshold }}%</span>
+      </p>
+      <div class="watchlist-feature-controls">
+        <button class="noface icon edit"></button>
+        <button class="noface icon remove" data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})"></button>
+      </div>
+    </div>
   </li>
+  <style>
+    background-color: red;
+  </style>
 {{end}}

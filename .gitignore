@@ -20,9 +20,9 @@ go.work.sum
 .env
 
 # Taylor's additions
+data
 update-data/*.json
 update-data/*.csv
-data
 go.sum
 whencaniuse
 datastar.js
