@@ -106,6 +106,7 @@ button {
   &.noface {
     background-color: transparent;
     box-shadow: none;
+    padding: 8px;
   }
 
   &.action {
@@ -255,7 +256,7 @@ aside#watchlist-pane {
       background-color: var(--col-bg);
       padding: 1em;
       border-radius: 4px;
-      color: var(--col-text-dim);
+      color: var(--col-text-faint);
       .watchlist-feature-label {
         flex-grow: 1;
       }
@@ -264,6 +265,7 @@ aside#watchlist-pane {
       }
       .watchlist-feature-thresh {
         color: var(--col-support);
+        font-weight: bold;
       }
 
       .watchlist-feature-bottom {
@@ -421,7 +423,7 @@ article#links {
     gap: 8px;
     flex-wrap: wrap;
 
-    & > .link-separator {
+    .link-separator {
       color: var(--col-text-faint);
     }
   }

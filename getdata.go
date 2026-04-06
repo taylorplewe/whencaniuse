@@ -118,7 +118,7 @@ func GetWatchlistFeaturesHtml(list *Watchlist) string {
 		}
 		features = append(features, WatchlistFeature{
 			featureIndexes[i],
-			C.GoString(title),
+			encodeMdText(C.GoString(title), false),
 			desiredSupportThreshold,
 		})
 		// watchlistTitles = append(watchlistTitles, C.GoString(title))

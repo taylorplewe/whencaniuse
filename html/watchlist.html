@@ -18,12 +18,9 @@ Expected data shape:
         <span class="watchlist-feature-thresh">{{ .DesiredSupportThreshold }}%</span>
       </p>
       <div class="watchlist-feature-controls">
-        <button class="noface icon edit"></button>
-        <button class="noface icon remove" data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})"></button>
+        <button class="noface icon edit" aria-label="Edit rule"></button>
+        <button class="noface icon remove" data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})" aria-label="Remove rule"></button>
       </div>
     </div>
   </li>
-  <style>
-    background-color: red;
-  </style>
 {{end}}

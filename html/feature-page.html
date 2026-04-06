@@ -24,7 +24,7 @@ Expected data shape: `Feature`
     <ul>
       <li><a href="https://caniuse.com/{{ .Id }}" target="_blank">"{{ .Title }}" on caniuse.com</a></li>
       {{range .Links}}
-        <span class="link-separator">|</span>
+        <li><span class="link-separator">|</span></li>
         <li><a href="{{ .Href }}" target="_blank">{{ .Display }}</a></li>
       {{end}}
     </ul>
