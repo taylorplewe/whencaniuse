@@ -31,18 +31,25 @@
   --col-brand-form-face-trim:        hsl(from var(--col-brand-form-face) h s calc(l + 9));
   --col-brand-form-face-hilite:      hsl(from var(--col-brand-form-face) h s calc(l + 12));
   --box-shadow-brand-form-face-trim: inset 0 0 0 2px var(--col-brand-form-face-trim);
+
+  --transition-len-sidepanel-slide: 0.4s;
 }
 
 body {
   background-color: var(--col-bg);
   margin: 0;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
   /* display: flex; */
-  color: var(--col-text);
+  color: var(--col-text-dim);
   height: 100vh;
   box-sizing: border-box;
   overflow: hidden;
+
+  grid-template-columns: 0.7fr 2fr 0.3fr 1fr;
+  transition: grid-template-columns var(--transition-len-sidepanel-slide) ease;
+  &:has(ul#watchlist-feature-list:empty) {
+    grid-template-columns: 1fr 2fr 0fr 1fr;
+  }
 }
 main {
   margin: 64px auto 0 auto;
@@ -82,6 +89,9 @@ h1, h2, h3, h4, h5, h6, p {
   margin: 0;
   word-break: break-word;
 }
+h1, h2 {
+  color: var(--col-text);
+}
 code {
   background-color: var(--col-code-bg);
   padding-inline: 6px;
@@ -95,7 +105,7 @@ code {
 }
 button {
   border: none;
-  color: inherit;
+  color: var(--col-text);
   font-family: inherit;
   font-size: inherit;
   background-color: var(--col-form-face);
@@ -234,6 +244,7 @@ dialog {
 }
 
 aside#watchlist-pane {
+  grid-column-start: 4;
   background-color: var(--col-bg-dark);
   padding: 1rem;
   width: 100%;
@@ -278,7 +289,7 @@ aside#watchlist-pane {
   }
 
   translate: 0;
-  transition: translate 0.4s ease;
+  transition: translate var(--transition-len-sidepanel-slide) ease;
   &:has(ul#watchlist-feature-list:empty) {
     /* display: none; */
     translate: 100%;
@@ -331,7 +342,7 @@ form#feature-search {
 
   & > input {
     background-color: initial;
-    color: inherit;
+    color: var(--col-text);
     border: none;
     font-size: inherit;
     font-family: inherit;
@@ -449,9 +460,6 @@ form#watch-edit-form {
   align-items: baseline;
   flex-wrap: wrap;
 }
-.faint {
-  color: var(--col-text-faint);
-}
 .global-percentage {
   font-size: 18pt;
   flex-shrink: 0;
@@ -499,7 +507,7 @@ form#watch-edit-form {
   }
 
   form#feature-search {
-    color: inherit;
+    color: var(--col-text);
     &::before {
       background-color: #0004;
     }

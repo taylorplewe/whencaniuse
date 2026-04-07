@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 )
@@ -35,6 +36,22 @@ func AddNewClient(watchlist Watchlist) ClientId {
 	ClientsMu.Unlock()
 
 	return newId
+}
+
+func IsFeatureInClientsWatchlist(clientId ClientId, featureIndex uint32) bool {
+	// first get their watchlist
+	client, exists := Clients[clientId]
+	if !exists {
+		return false
+	}
+
+	// look for feature index
+	return slices.IndexFunc(client.Watchlist, func(mapping map[uint]uint) bool {
+		for index := range mapping {
+			return index == uint(featureIndex)
+		}
+		return false // unreachable
+	}) != -1
 }
 
 // Debug

@@ -77,13 +77,15 @@ func GetFeaturePageHtmlFromId(id string, clientId ClientId) (string, error) {
 				Href:    C.GoString(cLink.href),
 			})
 		}
+		featureIndex := uint32(cFeature.index)
+		isInWatchlist := IsFeatureInClientsWatchlist(clientId, featureIndex)
 		feature := &Feature{
-			uint32(cFeature.index),
+			featureIndex,
 			id,
 			title,
 			description,
 			source,
-			true, // TODO set this properly
+			isInWatchlist, // TODO set this properly
 			links,
 		}
 		watchlistHtml := GetWatchlistHtmlFromClientId(clientId)
