@@ -18,7 +18,7 @@ const (
 )
 
 var Templates map[TemplateKind]*TemplateMapping = map[TemplateKind]*TemplateMapping{
-	TemplateIndex:       {[]string{"html/index.html"}, nil},
+	TemplateIndex:       {[]string{"html/index.html", "html/watchlist-pane.html", "html/watch-edit-dialog.html"}, nil},
 	TemplateFeaturePage: {[]string{"html/feature-page.html", "html/watch-dialog.html"}, nil},
 	TemplateWatchlist:   {[]string{"html/watchlist.html"}, nil},
 }

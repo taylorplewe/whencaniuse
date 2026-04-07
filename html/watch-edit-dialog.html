@@ -1,0 +1,44 @@
+{{define "watch-edit-dialog"}}
+<dialog id="watch-edit-dialog" closedby="any" data-ref:watch-edit-feature-dialog>
+  <form id="watch-edit-form" data-ref:watch-edit-feature-form>
+    <div class="msg-with-input">
+      <p>
+        Notify me when
+        <span data-show="$editingRuleTitle.length < 50" data-text="$editingRuleTitle" style="display: none" class="feature-name"></span>
+        <span data-show="$editingRuleTitle.length >= 50" style="display: none">this feature</span>
+        hits
+      </p>
+      <input
+        id="watch-edit-desired-support-threshold"
+        type="number"
+        value="90"
+        min="0"
+        max="100"
+        data-bind:editing-rule-thresh
+        data-on:focus="el.select()"
+      >
+      <p>%</p>
+    </div>
+    <div class="controls">
+      <button formmethod="dialog">Close</button>
+      <button
+        class="action"
+        type="button"
+        data-on:click="
+          $watchEditFeatureForm.checkValidity();
+          @post('/watchlist-edit', {
+            payload: {
+              clientId: $clientId,
+              index:    $editingRuleIndex,
+              thresh:   $editingRuleThresh
+            }
+          });
+          $watchEditFeatureDialog.close()"
+        data-indicator:is-adding-to-watchlist
+        data-attr:disabled="$isAddingToWatchlist"
+        data-text="$isAddingToWatchlist ? 'Updating...' : 'Update'"
+      ></button>
+    </div>
+  </form>
+</dialog>
+{{end}}

@@ -36,54 +36,8 @@ Expected data: `IndexData`
       <footer>&copy; 2026 Taylor Plewe | <a href="https://github.com/taylorplewe/whencaniuse" target="_blank">source code</a> | <a href="mailto:tplewe@outlook.com">contact</a></footer>
     </div>
 
-    <aside id="watchlist-pane">
-      <ul id="watchlist-feature-list">{{ .WatchlistContent }}</ul>
-      <label for="email-input">Email address</label>
-      <input id="email-input" data-bind:email>
-      <button class="action with-icon" icon="📭" data-on:click="@post('/submit', {filterSignals: {include: /clientId/}})">Notify me!</button>
-    </aside>
+    {{template "watchlist-pane" .}}
 
-    <dialog id="watch-edit-dialog" closedby="any" data-ref:watch-edit-feature-dialog>
-      <form id="watch-edit-form" data-ref:watch-edit-feature-form>
-        <div class="msg-with-input">
-          <p>
-            Notify me when
-            <span data-show="$editingRuleTitle.length < 50" data-text="$editingRuleTitle" style="display: none" class="feature-name"></span>
-            <span data-show="$editingRuleTitle.length >= 50" style="display: none">this feature</span>
-            hits
-          </p>
-          <input
-            id="watch-edit-desired-support-threshold"
-            type="number"
-            value="90"
-            min="0"
-            max="100"
-            data-bind:editing-rule-thresh
-            data-on:focus="el.select()"
-          >
-          <p>%</p>
-        </div>
-        <div class="controls">
-          <button formmethod="dialog">Close</button>
-          <button
-            class="action"
-            type="button"
-            data-on:click="
-              $watchEditFeatureForm.checkValidity();
-              @post('/watchlist-edit', {
-                payload: {
-                  clientId: $clientId,
-                  index:    $editingRuleIndex,
-                  thresh:   $editingRuleThresh
-                }
-              });
-              $watchEditFeatureDialog.close()"
-            data-indicator:is-adding-to-watchlist
-            data-attr:disabled="$isAddingToWatchlist"
-            data-text="$isAddingToWatchlist ? 'Updating...' : 'Update'"
-          ></button>
-        </div>
-      </form>
-    </dialog>
+    {{template "watch-edit-dialog" .}}
   </body>
 </html>
