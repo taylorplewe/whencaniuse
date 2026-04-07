@@ -135,6 +135,7 @@ extern "C" Feature* get_feature_by_id(const char* id) {
           links_data[i].display = feature_data->data + link_seek + 2;
           link_seek += len_link_display + 3; // trailing 0
         }
+        printf("link_seek: %u\n", link_seek);
         uint16_t len_link_href = *(uint16_t*)(feature_data->data + link_seek);
         links_data[i].href = feature_data->data + link_seek + 2;
         link_seek += len_link_href + 3; // trailing 0

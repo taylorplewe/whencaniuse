@@ -91,7 +91,7 @@ func serve(w http.ResponseWriter, req *http.Request) {
 		} else {
 			query := req.URL.Query()
 			clientId, _ := strconv.Atoi(query.Get("cid"))
-			html, err := GetFeatureHtmlFromId(trimmedUrl, ClientId(clientId))
+			html, err := GetFeaturePageHtmlFromId(trimmedUrl, ClientId(clientId))
 			if err != nil {
 				Templates[TemplateIndex].Template.Execute(w, fmt.Sprintf(`<p class="error">No feature found with ID '%s'`, IndexData{
 					trimmedUrl,

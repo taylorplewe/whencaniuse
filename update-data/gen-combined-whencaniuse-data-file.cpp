@@ -228,8 +228,8 @@ void append_bcd_feature_tree(
         simdjson::ondemand::object& compat_obj = sub_obj.value();
         // get feature's title and links
         std::string title = bcd_level_names.back();
-        std::string mdn_url,
-                    spec_url;
+        std::string mdn_url = "";
+        std::string spec_url = "";
         for (auto compat_field : compat_obj) {
           std::basic_string_view<char> compat_field_key = compat_field.unescaped_key();
           if (compat_field_key == "description") {
@@ -406,22 +406,30 @@ void append_bcd_feature_tree(
             write_string_simd_padded(out, title_lower_buf, len_title);
 
             // write links
-            uint32_t links_pos = out.tellp();
-            uint16_t len_link_mdn = mdn_url.size();
-            uint16_t len_link_spec = spec_url.size();
-            out.write((char*)&link_kind_mdn, 1);
-            out.write((char*)&len_link_mdn, 2);
-            write_string(out, mdn_url.data(), len_link_mdn);
-            out.write((char*)&link_kind_spec, 1);
-            out.write((char*)&len_link_spec, 2);
-            write_string(out, spec_url.data(), len_link_spec);
+            uint8_t num_links = (mdn_url.size() != 0) + (spec_url.size() != 0);
+            uint32_t links_pos = 0;
+            if (num_links > 0) {
+              links_pos = out.tellp();
+              uint16_t len_link_mdn = mdn_url.size();
+              uint16_t len_link_spec = spec_url.size();
+              if (len_link_mdn > 0) {
+                out.write((char*)&link_kind_mdn, 1);
+                out.write((char*)&len_link_mdn, 2);
+                write_string(out, mdn_url.data(), len_link_mdn);
+              }
+              if (len_link_spec > 0) {
+                out.write((char*)&link_kind_spec, 1);
+                out.write((char*)&len_link_spec, 2);
+                write_string(out, spec_url.data(), len_link_spec);
+              }
+            }
 
             out.seekp(header_pos, std::ios_base::beg);
             out.write((char*)&key_pos, 4);
             out.write((char*)&title_pos, 4);
             out.write((char*)&title_lower_pos, 4);
             out.write(zeroes, 4); // description
-            out.write((char*)&num_bcd_links, 1);
+            out.write((char*)&num_links, 1);
             out.write((char*)&links_pos, 4);
 
             header_pos += HEADER_ENTRY_SIZE;

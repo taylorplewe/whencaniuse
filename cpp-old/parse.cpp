@@ -104,20 +104,6 @@ extern "C" SearchResult search(const char* query) {
     }
   }
 
-  // auto item_result = data[query];
-  // if (item_result.has_value()) {
-  //   simdjson::ondemand::object item = data[query].value().get_object();
-
-  //   for (auto field : item) {
-  //     std::basic_string_view<char> key = field.unescaped_key();
-  //     if (key == "usage_perc_y") {
-  //       percentage += field.value().get_double().value();
-  //     } else if (key == "usage_perc_a") {
-  //       percentage += field.value().get_double().value();
-  //     }
-  //   }
-  // }
-
   // return percentage;
   printf("c++: returning %d features...\n", features_len);
   return {

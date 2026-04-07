@@ -45,7 +45,7 @@ func GetFeatureListHtmlFromSearchString(query string) string {
 }
 
 // TODO: use C.GoStringN() instead of C.GoString()
-func GetFeatureHtmlFromId(id string, clientId ClientId) (string, error) {
+func GetFeaturePageHtmlFromId(id string, clientId ClientId) (string, error) {
 	cId := C.CString(id)
 	defer C.free(unsafe.Pointer(cId))
 	cFeature := C.get_feature_by_id(cId)
@@ -83,7 +83,7 @@ func GetFeatureHtmlFromId(id string, clientId ClientId) (string, error) {
 			title,
 			description,
 			source,
-			false, // TODO set this properly
+			true, // TODO set this properly
 			links,
 		}
 		watchlistHtml := GetWatchlistHtmlFromClientId(clientId)
