@@ -43,10 +43,10 @@ body {
   color: var(--col-text-dim);
   height: 100vh;
   box-sizing: border-box;
-  overflow: hidden;
+  /* overflow: hidden; */
 
-  grid-template-columns: 1fr 2fr 0fr 1fr;
   transition: grid-template-columns var(--transition-len-sidepanel-slide) ease;
+  grid-template-columns: 1fr 2fr 0fr 1fr;
   &:not(:has(ul#watchlist-feature-list:empty)) {
     grid-template-columns: 0.7fr 2fr 0.3fr 1fr;
   }
@@ -253,11 +253,14 @@ dialog {
 }
 
 aside#watchlist-pane {
-  grid-column-start: 4;
+  position: fixed;
+  width: 25vw;
+  height: 100vh;
+  right: 0;
+  box-sizing: border-box;
+
   background-color: var(--col-bg-dark);
   padding: 1rem;
-  width: 100%;
-  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
