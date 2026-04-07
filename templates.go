@@ -7,7 +7,7 @@ import (
 
 type TemplateKind uint
 type TemplateMapping struct {
-	Path     string
+	Paths    []string
 	Template *template.Template
 }
 
@@ -18,17 +18,17 @@ const (
 )
 
 var Templates map[TemplateKind]*TemplateMapping = map[TemplateKind]*TemplateMapping{
-	TemplateIndex:       {"html/index.html", nil},
-	TemplateFeaturePage: {"html/feature-page.html", nil},
-	TemplateWatchlist:   {"html/watchlist.html", nil},
+	TemplateIndex:       {[]string{"html/index.html"}, nil},
+	TemplateFeaturePage: {[]string{"html/feature-page.html", "html/watch-dialog.html"}, nil},
+	TemplateWatchlist:   {[]string{"html/watchlist.html"}, nil},
 }
 
 func InitTemplates() {
 	var err error
 	for _, mapping := range Templates {
-		mapping.Template, err = template.ParseFiles(mapping.Path)
+		mapping.Template, err = template.ParseFiles(mapping.Paths...)
 		if err != nil {
-			fmt.Println("ERROR: could not parse", mapping.Path)
+			fmt.Println("ERROR: could not parse", mapping.Paths)
 			return
 		}
 	}
