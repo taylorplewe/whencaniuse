@@ -45,10 +45,10 @@ body {
   box-sizing: border-box;
   overflow: hidden;
 
-  grid-template-columns: 0.7fr 2fr 0.3fr 1fr;
+  grid-template-columns: 1fr 2fr 0fr 1fr;
   transition: grid-template-columns var(--transition-len-sidepanel-slide) ease;
-  &:has(ul#watchlist-feature-list:empty) {
-    grid-template-columns: 1fr 2fr 0fr 1fr;
+  &:not(:has(ul#watchlist-feature-list:empty)) {
+    grid-template-columns: 0.7fr 2fr 0.3fr 1fr;
   }
 }
 main {
@@ -63,6 +63,7 @@ footer {
   color: var(--col-text-faint);
 }
 ul {
+  margin: 0;
   list-style: none;
   padding-inline-start: 0;
 }
@@ -91,6 +92,10 @@ h1, h2, h3, h4, h5, h6, p {
 }
 h1, h2 {
   color: var(--col-text);
+}
+.standout {
+  color: var(--col-text);
+  font-weight: bold;
 }
 code {
   background-color: var(--col-code-bg);
@@ -195,14 +200,12 @@ dialog {
   background-color: var(--col-bg); /* a bizarre quirk is that if `inherit` is used for `background-color` here, it is darkened along with the actual background as if it were behind the backdrop */
   color: inherit; /* the quirk described above does not occur for `color` */ 
   padding: 1.5em;
+  max-width: 60vw;
 
   .controls {
     display: flex;
     gap: 16px;
     justify-content: end;
-    &:not(:first-child) {
-      margin-top: 32px;
-    }
   }
 
   opacity: 0;
@@ -224,6 +227,12 @@ dialog {
       background-color: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(2px);
     }
+  }
+
+  & > form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
   }
 }
 @starting-style {
@@ -357,6 +366,7 @@ form#feature-search {
 } 
 
 ul#feature-search-results {
+  margin-block: 1em;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
   gap: 8px;
@@ -423,7 +433,7 @@ article#feature-content {
 }
 
 article#links {
-  margin-top: 32px;
+  margin-top: 1em;
 
   & > h2 {
     color: var(--col-text-faint);
@@ -431,6 +441,7 @@ article#links {
     font-size: var(--base-font-size);
   }
   & > ul {
+    margin-top: 0.5em;
     display: inline-flex;
     gap: 8px;
     flex-wrap: wrap;
@@ -444,14 +455,15 @@ form#watch-form,
 form#watch-edit-form {
   .msg-with-input {
     color: var(--col-text-dim);
-    .feature-name {
-      color: var(--col-text);
-      font-weight: bold;
-    }
   }
   input#desired-support-threshold {
     width: 3em;
   }
+}
+
+ul#confirm-dialog-feature-list {
+  list-style: revert;
+  padding-inline-start: revert;
 }
 
 .split-items {

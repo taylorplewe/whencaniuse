@@ -31,7 +31,7 @@ Expected data: `IndexData`
             data-on:input="@get('/feature-search', {filterSignals: {include: /searchValue/}})"
           >
         </form>
-        <div id="main-content"><ul id="feature-search-results"></ul>{{ .MainContent }}</div>
+        <div id="main-content"><ul id="feature-search-results"></ul>{{ .MainHtml }}</div>
       </main>
       <footer>&copy; 2026 Taylor Plewe | <a href="https://github.com/taylorplewe/whencaniuse" target="_blank">source code</a> | <a href="mailto:tplewe@outlook.com">contact</a></footer>
     </div>
@@ -39,5 +39,7 @@ Expected data: `IndexData`
     {{template "watchlist-pane" .}}
 
     {{template "watch-edit-dialog" .}}
+
+    {{template "confirm-dialog" .}}
   </body>
 </html>

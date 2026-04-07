@@ -21,8 +21,8 @@ const (
 )
 
 type IndexData struct {
-	MainContent      string
-	WatchlistContent string
+	MainHtml      string
+	WatchlistHtml string
 }
 type Link struct {
 	Display string

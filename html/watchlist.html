@@ -1,13 +1,5 @@
 {{- /*
-Expected data shape:
-[
-  {
-    Index uint
-    Title string
-    DesiredSupportThreshold uint
-  }
-  ...
-]
+Expected data shape: []WatchlistFeature
 */ -}}
 {{range . }}
   <li>
@@ -33,7 +25,7 @@ Expected data shape:
         <button
           class="noface icon remove"
           title="Remove rule"
-          data-on:click="@post('/watchlist-remove', {payload:{clientId: Number($clientId), featureIndex: {{ .Index }} }})"
+          data-on:click="@post('/watchlist-remove', {payload:{clientId: $clientId, featureIndex: {{ .Index }} }})"
         ></button>
       </div>
     </div>

@@ -1,8 +1,8 @@
 {{define "watchlist-pane"}}
 <aside id="watchlist-pane">
-  <ul id="watchlist-feature-list">{{ .WatchlistContent }}</ul>
+  <ul id="watchlist-feature-list">{{ .WatchlistHtml }}</ul>
   <label for="email-input">Email address</label>
   <input id="email-input" data-bind:email>
-  <button class="action with-icon" icon="📭" data-on:click="@post('/submit', {filterSignals: {include: /clientId/}})">Notify me!</button>
+  <button class="action with-icon" icon="📭" command="show-modal" commandfor="confirm-dialog">Notify me!</button>
 </aside>
 {{end}}

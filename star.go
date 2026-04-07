@@ -161,20 +161,21 @@ func getDatastarCustomPayload(req *http.Request, params any) error {
 
 // Watchlist helper functions
 
-func GetWatchlistHtml(watchlist *Watchlist) string {
-	var html string
+func GetWatchlistHtml(watchlist *Watchlist) (string, string) {
+	var watchlistHtml, confirmDialogFeatureListHtml string
 	if len(*watchlist) > 0 {
-		html = GetWatchlistFeaturesHtml(watchlist)
+		watchlistHtml, confirmDialogFeatureListHtml = GetWatchlistFeaturesHtml(watchlist)
 	}
-	return html
+	return watchlistHtml, confirmDialogFeatureListHtml
 }
 func patchWatchlistHtml(sse *datastar.ServerSentEventGenerator, watchlist *Watchlist) {
-	sse.PatchElementf(`<ul id="watchlist-feature-list">%s</ul>`, GetWatchlistHtml(watchlist))
+	watchlistHtml, confirmDialogFeatureListHtml := GetWatchlistHtml(watchlist)
+	sse.PatchElementf(`<ul id="watchlist-feature-list">%s</ul><ul id="confirm-dialog-feature-list">%s</ul>`, watchlistHtml, confirmDialogFeatureListHtml)
 }
-func GetWatchlistHtmlFromClientId(clientId ClientId) string {
+func GetWatchlistHtmlFromClientId(clientId ClientId) (string, string) {
 	client, exists := Clients[clientId]
 	if !exists {
-		return ""
+		return "", ""
 	}
 	return GetWatchlistHtml(&client.Watchlist)
 }

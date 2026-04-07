@@ -2,7 +2,7 @@
 <dialog id="watch-dialog" closedby="any" data-ref:watch-feature-dialog>
   <form id="watch-form" data-ref:watch-feature-form>
     <div class="msg-with-input">
-      <p>Notify me when {{if lt (len .Title) 50}}<span class="feature-name">{{ .Title }}</span>{{else}}this feature{{end}} hits</p>
+      <p>Notify me when {{if lt (len .Title) 50}}<span class="standout">{{ .Title }}</span>{{else}}this feature{{end}} hits</p>
       <input
         id="desired-support-threshold"
         type="number"

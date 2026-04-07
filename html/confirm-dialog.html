@@ -1,0 +1,19 @@
+{{define "confirm-dialog"}}
+<dialog id="confirm-dialog" closedby="any" data-ref:confirm-dialog>
+  <form method="dialog">
+    <h2>Confirmation</h2>
+    <p>Emails will be sent to <span class="standout" data-text="$email"></span> when</p>
+    <ul id="confirm-dialog-feature-list"></ul>
+    <div class="controls">
+      <button>Close</button>
+      <button
+        class="action"
+        type="button"
+        data-on:click="@post('/submit', {filterSignals: {include: /clientId/}}); $confirmDialog.close();"
+      >
+        Sounds good!
+      </button>
+    </div>
+  </form>
+</dialog>
+{{end}}

@@ -88,7 +88,7 @@ func GetFeaturePageHtmlFromId(id string, clientId ClientId) (string, error) {
 			isInWatchlist, // TODO set this properly
 			links,
 		}
-		watchlistHtml := GetWatchlistHtmlFromClientId(clientId)
+		watchlistHtml, _ := GetWatchlistHtmlFromClientId(clientId)
 		var featureContentHtml strings.Builder
 		var html strings.Builder
 		_ = Templates[TemplateFeaturePage].Template.Execute(&featureContentHtml, feature)
@@ -102,7 +102,8 @@ func GetFeaturePageHtmlFromId(id string, clientId ClientId) (string, error) {
 	}
 }
 
-func GetWatchlistFeaturesHtml(list *Watchlist) string {
+// Returns both the HTML for the features in the watchlist pane, and the confirmation modal.
+func GetWatchlistFeaturesHtml(list *Watchlist) (string, string) {
 	// C++ side just wants a list of u32 IDs
 	var featureIndexes []uint32
 	for _, mapping := range *list {
@@ -127,11 +128,13 @@ func GetWatchlistFeaturesHtml(list *Watchlist) string {
 		// watchlistTitles = append(watchlistTitles, C.GoString(title))
 	}
 
-	var html strings.Builder
+	var watchlistFeaturesHtml strings.Builder
+	var confirmationModalFeaturesHtml strings.Builder
 
-	_ = Templates[TemplateWatchlist].Template.Execute(&html, &features)
+	_ = Templates[TemplateWatchlist].Template.Execute(&watchlistFeaturesHtml, &features)
+	_ = Templates[TemplateConfirmDialogFeatureList].Template.Execute(&confirmationModalFeaturesHtml, &features)
 
-	return html.String()
+	return watchlistFeaturesHtml.String(), confirmationModalFeaturesHtml.String()
 }
 
 func encodeMdText(text string, shouldRenderATags bool) string {
