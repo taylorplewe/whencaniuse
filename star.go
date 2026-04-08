@@ -46,6 +46,8 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request, url string
 			watchlist = &client.Watchlist
 		}
 		patchWatchlistHtml(sse, watchlist)
+
+		// sse.PatchElements(`<div id="watch-feature-button-container"><p>✅ Already in watchlist</p></div>`)
 	case "watchlist-edit":
 		type WatchlistEditParams struct {
 			ClientId         ClientId `json:"clientId"`
@@ -105,6 +107,7 @@ func HandleDatastarRequests(w http.ResponseWriter, req *http.Request, url string
 		})
 		sse := datastar.NewSSE(w, req)
 		patchWatchlistHtml(sse, &client.Watchlist)
+		// sse.PatchElements(`<div id="watch-feature-button-container"><button class="with-icon" command="show-modal" commandfor="watch-dialog" icon="👁️">Watch this feature</button></div>`)
 	case "watchlist-get":
 		type WatchlistGetParams struct {
 			ClientId ClientId `json:"clientId"`

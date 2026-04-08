@@ -9,13 +9,14 @@ Expected data shape: `Feature`
   {{if .Description}}<p id="feature-description">{{ .Description }}</p>{{end}}
   <div class="split-items">
     <div id="watch-feature-button-container">
-      {{if .IsInWatchlist }}
+      {{if .IsInWatchlist}}
         <p>✅ Already in watchlist</p>
-      {{else }}
+      {{else}}
         <button class="with-icon" command="show-modal" commandfor="watch-dialog" icon="👁️">Watch this feature</button>
-      {{end }}
+      {{end}}
     </div>
     <p><span class="faint">Source:</span>
+      <!-- TODO find a better way of doing this magic number switch -->
       {{if eq .Source 0}}
         caniuse.com
       {{else if eq .Source 1}}

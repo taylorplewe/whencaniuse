@@ -85,7 +85,7 @@ func GetFeaturePageHtmlFromId(id string, clientId ClientId) (string, error) {
 			title,
 			description,
 			source,
-			isInWatchlist, // TODO set this properly
+			isInWatchlist,
 			links,
 		}
 		watchlistHtml, confirmDialogFeatureListHtml := GetWatchlistHtmlFromClientId(clientId)
