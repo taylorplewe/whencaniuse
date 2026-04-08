@@ -88,13 +88,14 @@ func GetFeaturePageHtmlFromId(id string, clientId ClientId) (string, error) {
 			isInWatchlist, // TODO set this properly
 			links,
 		}
-		watchlistHtml, _ := GetWatchlistHtmlFromClientId(clientId)
+		watchlistHtml, confirmDialogFeatureListHtml := GetWatchlistHtmlFromClientId(clientId)
 		var featureContentHtml strings.Builder
 		var html strings.Builder
 		_ = Templates[TemplateFeaturePage].Template.Execute(&featureContentHtml, feature)
 		_ = Templates[TemplateIndex].Template.Execute(&html, IndexData{
 			featureContentHtml.String(),
 			watchlistHtml,
+			confirmDialogFeatureListHtml,
 		})
 		return html.String(), nil
 	} else {

@@ -21,8 +21,9 @@ const (
 )
 
 type IndexData struct {
-	MainHtml      string
-	WatchlistHtml string
+	MainHtml                     string
+	WatchlistHtml                string
+	ConfirmDialogFeatureListHtml string
 }
 type Link struct {
 	Display string
@@ -83,6 +84,7 @@ func serve(w http.ResponseWriter, req *http.Request) {
 		Templates[TemplateIndex].Template.Execute(w, IndexData{
 			`<ul id="feature-search-results"></ul>`,
 			"",
+			"",
 		})
 		// http.ServeFile(w, req, "index.html")
 	default:
@@ -95,6 +97,7 @@ func serve(w http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				Templates[TemplateIndex].Template.Execute(w, fmt.Sprintf(`<p class="error">No feature found with ID '%s'`, IndexData{
 					trimmedUrl,
+					"",
 					"",
 				}))
 			} else {

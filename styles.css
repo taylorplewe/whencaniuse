@@ -195,7 +195,7 @@ input {
   }
 }
 dialog {
-  border: none;
+  border: 2px solid var(--col-form-face-trim);
   border-radius: 8px;
   background-color: var(--col-bg); /* a bizarre quirk is that if `inherit` is used for `background-color` here, it is darkened along with the actual background as if it were behind the backdrop */
   color: inherit; /* the quirk described above does not occur for `color` */ 
