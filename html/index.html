@@ -4,9 +4,11 @@ Expected data: `IndexData`
 <!doctype html>
 <html
   lang="en-US"
-  data-init="
-    ($clientId = Number(sessionStorage.getItem('whencaniuse-client-id')))
-  "
+  data-init="$clientId = Number(sessionStorage.getItem('whencaniuse-client-id'))"
+  data-on:keydown="if (evt.key === '/') {
+    $searchInput.select();
+    evt.preventDefault();
+  }"
   data-on-signal-patch="
     sessionStorage.setItem('whencaniuse-client-id', $clientId);
     history.replaceState(null, '', [window.location.pathname, $clientId].filter(Boolean).join('?cid='))"
@@ -26,8 +28,10 @@ Expected data: `IndexData`
           <input
             id="search-input"
             type="search"
+            data-ref:search-input
             data-init="el.focus()"
             data-bind:search-value
+            data-on:keydown="evt.key === '/' && evt.stopPropagation()"
             data-on:input="@get('/feature-search', {filterSignals: {include: /searchValue/}})"
           >
         </form>

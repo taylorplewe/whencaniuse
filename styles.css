@@ -45,11 +45,11 @@ body {
   box-sizing: border-box;
   /* overflow: hidden; */
 
-  transition: grid-template-columns var(--transition-len-sidepanel-slide) ease;
+  /* transition: grid-template-columns var(--transition-len-sidepanel-slide) ease; */
   grid-template-columns: 1fr 2fr 0fr 1fr;
-  &:not(:has(ul#watchlist-feature-list:empty)) {
-    grid-template-columns: 0.7fr 2fr 0.3fr 1fr;
-  }
+  /* &:not(:has(ul#watchlist-feature-list:empty)) { */
+    /* grid-template-columns: 0.7fr 2fr 0.3fr 1fr; */
+  /* } */
 }
 main {
   margin: 64px auto 0 auto;
